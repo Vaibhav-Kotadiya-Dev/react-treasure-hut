@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import IVersionSchema from '../versionRepositories/IVersionSchema';
+import { Permission, UserType } from '../../utils/constant';
 
 export default interface IUserModel extends IVersionSchema {
   mobileNumber: string;
@@ -14,4 +15,7 @@ export default interface IUserModel extends IVersionSchema {
   currentSequence: number;
   currentAttempts: number;
   isBroadcasted: boolean;
+  userType: UserType;
+  permissions: Permission[];
+  hashedPassword: string;
 };

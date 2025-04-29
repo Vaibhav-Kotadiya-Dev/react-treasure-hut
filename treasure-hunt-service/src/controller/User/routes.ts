@@ -1,9 +1,15 @@
 import { Router } from 'express';
 import UserController from './UserController';
+import { authorizeAdminWithPermissions } from '../../middlewares/authorization';
+import { Permission } from '../../utils/constant';
+import { authenticateUser } from '../../middlewares/authentication';
 
 const userHandler= Router();
-
-userHandler.post('/create',UserController.create);
-// userHandler.post('/login',UserController.login);
+// only for debug purpose
+// userHandler.post('/create', UserController.create);
+userHandler.get('/list', authenticateUser, authorizeAdminWithPermissions([Permission.READ]), UserController.list);
+userHandler.patch('/update/:id', authenticateUser, authorizeAdminWithPermissions([Permission.UPDATE]), UserController.updateUserRegistrationDate);
+userHandler.post('/admin/login', UserController.adminLogin);
+userHandler.post('/refresh-token', UserController.refreshToken);
 
 export default userHandler;

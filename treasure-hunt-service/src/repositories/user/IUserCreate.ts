@@ -1,4 +1,6 @@
 import { Types } from "mongoose";
+import { Permission, UserType } from "../../utils/constant";
+
 
 export default interface IUserCreate {
     mobileNumber: string;
@@ -13,4 +15,7 @@ export default interface IUserCreate {
     currentSequence: number;
     currentAttempts: number;
     isBroadcasted: boolean;
+    userType: UserType;
+    permissions: Permission[];
+    hashedPassword: string;
 };

@@ -23,8 +23,7 @@ class MessengerController {
   };
   sendLatestQuestionToParticipant = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-      const { phone = ''} = req.body;
-      const now = new Date();
+      const { phone = "8744907196" } = req.body;
       const question = await this.questionRepository.get({ isStart: true });
       if (!question) return;
       await this.userRepository.update({ mobileNumber: phone }, { currentSequence: question.sequence });
@@ -38,7 +37,7 @@ class MessengerController {
 
   evaluateAnswerAndReply = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-      const { phone = '' } = req.body;
+      const { phone = "8744907196" } = req.body;
       const latestMessage = await getLastUserMessage(phone);
       const userData = await this.userRepository.get({ mobileNumber: phone });
 

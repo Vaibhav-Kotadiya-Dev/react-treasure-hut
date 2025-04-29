@@ -40,7 +40,6 @@ export default class VersionRepository<D extends mongoose.Document, M extends mo
     }
 
     async get(data: object, projection: object = {} , options: object = {}) {
-        console.log(data, 'data');
         return this.modelType.findOne({ ...data }, projection, options).lean();
     }
 }

@@ -10,7 +10,10 @@ const configuration : IConfig = {
     PRIVATE_KEY: process.env.PRIVATE_KEY|| '',
     TWILIO_WHATSAPP_NUMBER: process.env.TWILIO_WHATSAPP_NUMBER || '',
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
-    WEB_HOOK_SECRET: process.env.WEB_HOOK_SECRET || ''
+    WEB_HOOK_SECRET: process.env.WEB_HOOK_SECRET || '',
+    JWT_SECRET: process.env.JWT_SECRET || '',
+    JWT_EXPIRE: process.env.JWT_EXPIRE || '',
+    SALT_ROUND: process.env.SALT_ROUND || ''
 };
 
-export default configuration;
+export default Object.freeze(configuration);

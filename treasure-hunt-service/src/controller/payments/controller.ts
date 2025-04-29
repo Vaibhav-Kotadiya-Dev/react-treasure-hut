@@ -5,6 +5,7 @@ import Stripe from "stripe";
 import PaymentRepository from '../../repositories/payments/PaymentRepositories';
 import UserRepository from "../../repositories/user/UserRepositories";
 import IUserModel from "../../repositories/user/IUserModel";
+import { Permission, UserType } from "../../utils/constant";
 
 class PaymentController {
   private config: IConfig;
@@ -108,6 +109,8 @@ class PaymentController {
             isPaymentError: false,
             registrationDate: regDate.toISOString(),
             teamMemberCount,
+            userType: UserType.ADMIN,
+            permissions: [Permission.CREATE, Permission.READ]
           });
           if(!userResponse._id){
              throw new Error('User is not added succesfully');

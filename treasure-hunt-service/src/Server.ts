@@ -1,9 +1,8 @@
-import express from "express";
-import { Response } from "express";
-import { Request } from "express";
+import express, { Response, Request } from "express";
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import mainRoute from "./routes";
 import DataBaseServer from "./libs/DataBase";
-import cors from 'cors';
 import IConfig from "./config/IConfig";
 import { verifyPaymentWebhook } from "./controller/payments/routes";
 import { startBroadcastJob } from "./cron/broadcast";
@@ -24,15 +23,18 @@ export default class Server {
     return this;
   };
 
-  setUpWebhookRoute = (): void => {
+  setUpWebhookRoute = (): Server => {
       const { app } = this;
       app.post('/api/payment/verify', express.raw({ type: 'application/json' }), verifyPaymentWebhook); // mount it before bodyParser
+      return this;
   };
   
-  initBodyParser = (): void => {
+  initBodyParser = (): Server => {
     const { app } = this;
+    app.use(cookieParser());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
+    return this;
   };
 
   setUpRoutes = (): Server => {
@@ -45,12 +47,11 @@ export default class Server {
     return this;
   };
 
-  run = (): void => {
+  run = (): Server => {
     const {
       app,
       config: { PORT: port, MONGO_URL: mongoUrl },
     } = this;
-
     DataBaseServer.open(mongoUrl)
       .then(() => {
         app.listen(port, () => {
@@ -62,5 +63,6 @@ export default class Server {
       .catch((err) => {
         console.error("ERROR", err);
       });
+    return this;
   };
 }

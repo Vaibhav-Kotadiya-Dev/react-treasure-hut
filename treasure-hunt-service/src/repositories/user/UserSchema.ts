@@ -1,3 +1,4 @@
+import { Permission, UserType } from '../../utils/constant';
 import VersionSchema from '../versionRepositories/VersionSchema';
 import { Types} from 'mongoose';
 export default class UserSchema extends VersionSchema {
@@ -14,7 +15,21 @@ export default class UserSchema extends VersionSchema {
       voucherUnlockedAt: { type: Date, default: null },
       currentSequence: { type: Number, default: -1 },
       currentAttempts: { type: Number, default: 0 },
-      isBroadcasted: { type: Boolean, default: false }
+      isBroadcasted: { type: Boolean, default: false },
+      userType: {
+        type: String,
+        enum: Object.values(UserType),
+        default: UserType.USER,
+      },
+      permissions: {
+        type: [String],
+        enum: Object.values(Permission),
+        default: [Permission.READ],
+      },
+      hashedPassword: {
+        type: String,
+        default: null
+      }
     };
     super(userSchema, options);
   }

@@ -6,6 +6,9 @@ interface IConfig {
     TWILIO_WHATSAPP_NUMBER: string;
     STRIPE_SECRET_KEY: string;
     WEB_HOOK_SECRET: string;
+    JWT_SECRET: string;
+    JWT_EXPIRE: string;
+    SALT_ROUND: string;
 }
 
 export default IConfig;
