@@ -12,4 +12,27 @@ const registorUser = (dataToPost) => {
     );
 };
 
-export { registorUser };
+const listOfUser = () => {
+  return AxiosInterceptor.get("/api/user/list",{ withCredentials: true });
+};
+
+
+const updateUserRegistrationDate = (id, dataToUpdate) => {
+    return AxiosInterceptor.patch(
+      `/api/user/update/${id}`,
+      {
+        ...dataToUpdate,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+};
+
+const adminLogin = (credentials = {}) => {
+  return AxiosInterceptor.post("/api/user/admin/login", credentials, {
+    withCredentials: true,
+  });
+}
+
+export { registorUser, listOfUser, updateUserRegistrationDate, adminLogin };
