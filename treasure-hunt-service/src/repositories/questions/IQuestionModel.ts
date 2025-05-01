@@ -1,7 +1,6 @@
 import IVersionSchema from '../versionRepositories/IVersionSchema';
 
 export default interface IQuestionModel extends IVersionSchema {
-  title: string;
   clue: string;
   hint: string;
   trivia: string;

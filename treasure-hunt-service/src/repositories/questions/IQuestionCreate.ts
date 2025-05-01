@@ -1,5 +1,4 @@
 export interface IQuestion extends Document {
-    title: string;
     clue: string;
     hint: string;
     trivia: string;

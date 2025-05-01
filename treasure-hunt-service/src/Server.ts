@@ -32,7 +32,7 @@ export default class Server {
   initBodyParser = (): Server => {
     const { app } = this;
     app.use(cookieParser());
-    app.use(express.urlencoded({ extended: true }));
+    app.use(express.urlencoded({ extended: false }));
     app.use(express.json());
     return this;
   };
@@ -57,7 +57,7 @@ export default class Server {
         app.listen(port, () => {
           console.log(`:::App is running successfully at port number: ${port}:::::::`);
           seedQuestionsIfEmpty();
-          startBroadcastJob();
+          // startBroadcastJob();
         });
       })
       .catch((err) => {

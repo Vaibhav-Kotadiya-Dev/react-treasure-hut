@@ -7,9 +7,13 @@ import config from "../../config/configuration";
 import IUserModel from "../../repositories/user/IUserModel";
 import { Permission, UserType } from "../../utils/constant";
 import { generateAccessToken, generateRefreshToken } from "../../utils/AuthService";
+import sendWhatsAppMessage from "../../libs/twilio-client";
+import QuestionRepository from "../../repositories/questions/QuestionRepositories";
+import { IQuestion } from "../../repositories/questions/IQuestionCreate";
 
 class UserController {
   private userRepository: UserRepository = new UserRepository();
+  private questionRepository: QuestionRepository = new QuestionRepository();
   private config: IConfig;
   static instance: UserController;
   constructor(config: IConfig) {
@@ -27,7 +31,7 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const { mobileNumber, registrationDate, teamMemberCount = 5 } = req.body;
+      const { mobileNumber, registrationDate = new Date().toISOString(), teamMemberCount = 5 } = req.body;
       const response: IUserModel = await this.userRepository.create({
         mobileNumber,
         registrationDate,
@@ -38,6 +42,12 @@ class UserController {
       if (!response._id) {
         throw new Error("User has not added successfully");
       }
+      const question: any = await this.questionRepository.get({ isStart: true });
+      if (!question) {
+        throw new Error("No Question found");
+      };
+      await this.userRepository.update({ mobileNumber }, { currentSequence: question.sequence });
+      await sendWhatsAppMessage(response?.mobileNumber, question?.clue);
       return res.status(200).json(response);
     } catch (error) {
       console.log(error);

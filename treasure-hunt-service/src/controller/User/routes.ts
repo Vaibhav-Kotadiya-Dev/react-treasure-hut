@@ -6,7 +6,7 @@ import { authenticateUser } from '../../middlewares/authentication';
 
 const userHandler= Router();
 // only for debug purpose
-// userHandler.post('/create', UserController.create);
+userHandler.post('/create', UserController.create);
 userHandler.get('/list', authenticateUser, authorizeAdminWithPermissions([Permission.READ]), UserController.list);
 userHandler.patch('/update/:id', authenticateUser, authorizeAdminWithPermissions([Permission.UPDATE]), UserController.updateUserRegistrationDate);
 userHandler.post('/admin/login', UserController.adminLogin);

@@ -3,7 +3,6 @@ import { Schema, Types } from 'mongoose';
 export default class QuestionSchema extends VersionSchema {
   constructor(options: any) {
     const questionSchema = {
-      title: { type: String, required: true },
       clue: { type: String, required: true },
       hint: { type: String, required: true },
       trivia: { type: String, required: true },

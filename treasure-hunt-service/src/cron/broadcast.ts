@@ -31,7 +31,7 @@ export const startBroadcastJob = (): void => {
             console.log(`Broadcasting to user: ${user.mobileNumber}`);
             const question = await questionRepository.get({ isStart: true });
             if (!question) return;
-            await sendWhatsAppMessage(user?.mobileNumber, question?.title);
+            await sendWhatsAppMessage(user?.mobileNumber, question?.clue);
             await userRepository.update(
               { mobileNumber: user?.mobileNumber },
               { currentSequence: question.sequence, isBroadcasted: true }
