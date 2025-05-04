@@ -35,7 +35,7 @@ export default class UserRepository extends VersionRepository<IUserModel, mongoo
     return super.delete(id);
   }
 
-  async get(data: object) {
-    return super.get({ ...data });
+  async get(data: object, projection?: object, options?: object) {
+    return super.get({ ...data }, projection, options);
   }
 }

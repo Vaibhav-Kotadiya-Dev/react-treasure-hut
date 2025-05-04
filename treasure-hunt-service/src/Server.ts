@@ -7,6 +7,7 @@ import IConfig from "./config/IConfig";
 import { verifyPaymentWebhook } from "./controller/payments/routes";
 import { startBroadcastJob } from "./cron/broadcast";
 import { seedQuestionsIfEmpty } from "./seed/questions";
+import { errorHandler } from "./middlewares/error-handler";
 
 
 export default class Server {
@@ -41,9 +42,10 @@ export default class Server {
     const { app } = this;
     app.use(cors());
     app.get("/health", (req: Request, res: Response) => {
-      res.send(":::SERVER IS WORKING:::::");
+      res.send(":::SERVER IS WORKING:::");
     });
     app.use("/api", mainRoute);
+    app.use(errorHandler);
     return this;
   };
 

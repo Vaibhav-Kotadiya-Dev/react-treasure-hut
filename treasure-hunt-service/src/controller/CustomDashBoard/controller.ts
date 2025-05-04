@@ -56,13 +56,22 @@ class MessengerController {
     try {
       const { Body = "", From = "" } = req.body;
       let latestMessage = "";
+      console.log(Body, From);
       if (Body) {
         latestMessage = Body;
         const phone = parsePhoneNumberWithError(
           From?.split(":")[1]
         ).nationalNumber;
         console.log(`${phone} -> ${latestMessage}`);
-        const userData = await this.userRepository.get({ mobileNumber: phone });
+        const userData = await this.userRepository.get(
+          {
+            mobileNumber: phone,
+            isPaymentSuccessful: { $eq: false },
+            userType: { $eq: "user" },
+          },
+          {},
+          { sort: { createdAt: -1 } }
+        );
         if (!userData) throw new Error("User not found");
         const now = new Date();
         if (now < new Date(userData.registrationDate)) {
@@ -85,7 +94,6 @@ class MessengerController {
             const question = await this.questionRepository.get({
               sequence: currentSequence,
             });
-            console.log(`Next Question: ${question?.hint}`);
             if (!question) throw new Error("Question not found");
 
             if (latestMessage && question?.answer?.length) {
@@ -131,6 +139,8 @@ class MessengerController {
                     currentSequence: nextSequence,
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
+                  const correctAnswers = question?.answer?.length === 1 ? question?.answer[0]: question?.answer.join(",");
+                  await sendWhatsAppMessage(phone, `✅ Correct Answer: ${correctAnswers}`);
                   await sendWhatsAppMessage(phone, nextQuestion?.clue);
                 } else {
                   await this.userRepository.updateById(userData._id, {

@@ -109,7 +109,7 @@ class PaymentController {
             isPaymentError: false,
             registrationDate: regDate.toISOString(),
             teamMemberCount,
-            userType: UserType.ADMIN,
+            userType: UserType.USER,
             permissions: [Permission.CREATE, Permission.READ]
           });
           if(!userResponse._id){

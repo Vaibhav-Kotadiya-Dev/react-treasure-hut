@@ -9,7 +9,6 @@ import { Permission, UserType } from "../../utils/constant";
 import { generateAccessToken, generateRefreshToken } from "../../utils/AuthService";
 import sendWhatsAppMessage from "../../libs/twilio-client";
 import QuestionRepository from "../../repositories/questions/QuestionRepositories";
-import { IQuestion } from "../../repositories/questions/IQuestionCreate";
 
 class UserController {
   private userRepository: UserRepository = new UserRepository();
@@ -32,6 +31,18 @@ class UserController {
   ): Promise<any> => {
     try {
       const { mobileNumber, registrationDate = new Date().toISOString(), teamMemberCount = 5 } = req.body;
+      const userPresented = await this.userRepository.get({ mobileNumber }, {}, { sort: { createdAt: -1 }});
+      if(userPresented && !userPresented.hasVoucher){
+        const { createdAt: lastRegistrationDate } = userPresented;
+        const lastDate = new Date(lastRegistrationDate);
+        const now = new Date();
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        if(lastDate > oneDayAgo){
+           const error = new Error('User can not re-registor in 24 hours') as any;
+           error.statusCode = 409;
+           throw error;
+        }
+      }
       const response: IUserModel = await this.userRepository.create({
         mobileNumber,
         registrationDate,
@@ -40,18 +51,22 @@ class UserController {
         permissions: [Permission.CREATE, Permission.READ]
       });
       if (!response._id) {
-        throw new Error("User has not added successfully");
+        const error = new Error('User has not added successfully') as any;
+        error.statusCode = 500;
+        throw error;
       }
       const question: any = await this.questionRepository.get({ isStart: true });
       if (!question) {
-        throw new Error("No Question found");
+        const error = new Error('No Question found') as any;
+        error.statusCode = 404;
+        throw error;
       };
-      await this.userRepository.update({ mobileNumber }, { currentSequence: question.sequence });
       await sendWhatsAppMessage(response?.mobileNumber, question?.clue);
+      await this.userRepository.update({ mobileNumber }, { currentSequence: question.sequence });
       return res.status(200).json(response);
     } catch (error) {
-      console.log(error);
-      return res.sendStatus(500);
+      console.error(`Error in user create ${error}`);
+      return next(error);
     }
   };
 
