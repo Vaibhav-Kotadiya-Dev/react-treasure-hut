@@ -6,6 +6,8 @@ import PaymentRepository from '../../repositories/payments/PaymentRepositories';
 import UserRepository from "../../repositories/user/UserRepositories";
 import IUserModel from "../../repositories/user/IUserModel";
 import { Permission, UserType } from "../../utils/constant";
+import sendWhatsAppMessage from "../../libs/twilio-client";
+import QuestionRepository from "../../repositories/questions/QuestionRepositories";
 
 class PaymentController {
   private config: IConfig;
@@ -13,6 +15,7 @@ class PaymentController {
   static instance: PaymentController;
   private userRepository: UserRepository = new UserRepository();
   private paymentRepository: PaymentRepository = new PaymentRepository();
+  private questionRepository: QuestionRepository = new QuestionRepository();
   constructor(config: IConfig) {
     this.config = config;
     this.stripe = new Stripe(this.config.STRIPE_SECRET_KEY);
@@ -31,8 +34,22 @@ class PaymentController {
     try {
       const { amount = 100, registrationDate, mobileNumber, teamMemberCount } = req.body;
       if (!amount || !mobileNumber) {
-        return res.status(400).json({ error: "Missing required fields" });
+        const error = new Error("Missing required fields") as any;
+        error.statusCode = 400;
+        throw error;
       };
+      const userPresented = await this.userRepository.get({ mobileNumber }, {}, { sort: { createdAt: -1 }});
+      if(userPresented && !userPresented.hasVoucher){
+        const { createdAt: lastRegistrationDate } = userPresented;
+        const lastDate = new Date(lastRegistrationDate);
+        const now = new Date();
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        if(lastDate > oneDayAgo){
+           const error = new Error('User can not re-registor in 24 hours or complete your previous quiz') as any;
+           error.statusCode = 409;
+           throw error;
+        }
+      }
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -56,10 +73,7 @@ class PaymentController {
       const checkoutUrl = session.url;
       return res.status(200).json({ checkoutUrl });
     } catch (error) {
-      console.error("Stripe session error:", error);
-      return res
-        .status(500)
-        .json({ error: "Failed to create checkout session" });
+      return next(error);
     }
   };
   webhook = async (
@@ -77,7 +91,10 @@ class PaymentController {
         this.config.WEB_HOOK_SECRET!
       );
       const session = event.data.object as Stripe.Checkout.Session;
-      if (event.type === 'checkout.session.completed' && session.payment_status === "paid") {
+      if (
+        event.type === "checkout.session.completed" &&
+        session.payment_status === "paid"
+      ) {
         const metadata = session?.metadata as {
           mobileNumber?: string;
           registrationDate?: string;
@@ -99,9 +116,9 @@ class PaymentController {
           status: session.status,
         });
         if (payment._id) {
-            const regDate: Date = new Date(registrationDate)
-            regDate.setHours(0, 0, 0, 0);
-            const userResponse: IUserModel = await this.userRepository.create({
+          const regDate: Date = new Date(registrationDate);
+          regDate.setHours(0, 0, 0, 0);
+          const userResponse: IUserModel = await this.userRepository.create({
             mobileNumber,
             paymentId: payment._id,
             isPaymentSuccessful: true,
@@ -110,20 +127,59 @@ class PaymentController {
             registrationDate: regDate.toISOString(),
             teamMemberCount,
             userType: UserType.USER,
-            permissions: [Permission.CREATE, Permission.READ]
+            permissions: [Permission.CREATE, Permission.READ],
           });
-          if(!userResponse._id){
-             throw new Error('User is not added succesfully');
+          if (!userResponse._id) {
+            const error = new Error("User is not added succesfully") as any;
+            error.statusCode = 500;
+            throw error;
           }
+          const question: any = await this.questionRepository.get({
+            isStart: true,
+          });
+          if (!question) {
+            const error = new Error("No Question found") as any;
+            error.statusCode = 404;
+            throw error;
+          }
+          await sendWhatsAppMessage(userResponse?.mobileNumber, question?.clue);
+          await this.userRepository.update(
+            { mobileNumber },
+            { currentSequence: question.sequence }
+          );
         }
         return res.status(200).json({ success: true, payment });
+      } else {
+        const error = new Error("Payment not completed") as any;
+        error.statusCode = 400;
+        throw error;
       }
-      res.status(400).json({ error: "Payment not completed" });
+      
     } catch (err: any) {
       console.error("Webhook signature verification failed:", err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
+      return next(err);
     }
   };
+  verifyPayment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { sessionId } = req.query;
+      if (!sessionId) {
+        const error = new Error("Missing sessionId") as any;
+        error.statusCode = 400;
+        throw error;
+      }
+      const session: Stripe.Response<Stripe.Checkout.Session> = await this.stripe.checkout.sessions.retrieve(
+        sessionId.toString()
+      );
+      if (session.payment_status === "paid") {
+        return res.json({ valid: true, session });
+      } else {
+        return res.json({ valid: false, status: session.payment_status });
+      }
+    } catch (err) {
+      return next(err);
+    }
+  }
 }
 
 export default PaymentController.getInstance();

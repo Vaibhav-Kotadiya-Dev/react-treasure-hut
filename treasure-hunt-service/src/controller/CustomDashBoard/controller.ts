@@ -66,7 +66,7 @@ class MessengerController {
         const userData = await this.userRepository.get(
           {
             mobileNumber: phone,
-            isPaymentSuccessful: { $eq: false },
+            isPaymentSuccessful: { $eq: true },
             userType: { $eq: "user" },
           },
           {},
