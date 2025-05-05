@@ -1,58 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
+import './success.css';
+import { verifySession } from '../../api/payment';
+import { useToast } from '../../components/toaster';
 
-const SuccessPage = () => {
-  const handleGoHome = () => {
-    window.location.href = "/";
-  };
+const PaymentSuccess = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isValid, setIsValid] = useState(null); // null = loading, false = rejected
+  const query = new URLSearchParams(location.search);
+  const sessionId = query.get('session_id');
+  const { showToast } = useToast();
+  useEffect(() => {
+    if (!sessionId) {
+      navigate("/");
+      return;
+    }
+    if (isValid === null) {
+      verifySession(sessionId)
+        .then((response) => {
+          const { data = {} } = response;
+          if (data?.valid) {
+            setIsValid(true);
+            showToast("User registored succesfully", "success");
+          }
+        })
+        .catch(() => navigate("/"));
+    }
+  }, [sessionId]);
 
+  if (isValid === null) {
+    return (
+      <Box className="payment-container" sx={{ textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography mt={2}>Verifying payment...</Typography>
+      </Box>
+    );
+  }
+  if(isValid == false){
+    return (
+        <Box className="payment-container" sx={{ textAlign: 'center' }}>
+          <Typography mt={2}>Payment failed. Please try again.</Typography>
+        </Box>
+      );
+  }
   return (
-    <div
-      style={{
-        backgroundColor: "#8B4513",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "#ffffff",
-          padding: "2rem 3rem",
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-          textAlign: "center",
-          maxWidth: "500px",
-        }}
+    <Box className="payment-container">
+      <img src="/panda.png" alt="Success Panda" className="success-image" />
+      <Typography variant="h6" className="success-message">
+        Payment confirmed!
+      </Typography>
+      <Typography variant="body1" className="adventure-text">
+        Get ready to begin your adventure!
+      </Typography>
+      <Button
+        variant="contained"
+        className="back-button"
+        onClick={() => navigate('/')}
       >
-        <h1 style={{ color: "#1976d2", marginBottom: "1rem" }}>
-          {" "}
-          Treasure Request In Progress!
-        </h1>
-
-        <p style={{ marginBottom: "2rem", color: "#333", fontSize: "1.1rem" }}>
-          Thank you for registering. Your treasure hunt request is now being
-          processed. Stay tuned — we will notify you when it’s ready!
-        </p>
-
-        <button
-          style={{
-            backgroundColor: "#1976d2",
-            color: "#ffffff",
-            border: "none",
-            padding: "0.75rem 1.5rem",
-            borderRadius: "8px",
-            fontSize: "1rem",
-            cursor: "pointer",
-          }}
-          onClick={handleGoHome}
-        >
-          Go to Home
-        </button>
-      </div>
-    </div>
+        Back Home
+      </Button>
+    </Box>
   );
 };
 
-export default SuccessPage;
+export default PaymentSuccess;
+
+

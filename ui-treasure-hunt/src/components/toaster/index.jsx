@@ -1,19 +1,36 @@
-import React from 'react';
+// ToastContext.js
+import React, { createContext, useState, useContext } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
-const SuccessToast = ({ open, message, onClose }) => {
+const ToastContext = createContext();
+
+export const ToastProvider = ({ children }) => {
+  const [toast, setToast] = useState({ open: false, message: '', type: 'success' });
+
+  const showToast = (message, type = 'success') => {
+    setToast({ open: true, message, type });
+  };
+
+  const handleClose = () => {
+    setToast({ ...toast, open: false });
+  };
+
   return (
-    <Snackbar
-      open={open}
-      autoHideDuration={3000} // Toast disappears after 3 seconds
-      onClose={onClose}
-      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-    >
-      <Alert onClose={onClose} severity="success" sx={{ width: '100%' }}>
-        {message}
-      </Alert>
-    </Snackbar>
+    <ToastContext.Provider value={{ showToast }}>
+      {children}
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleClose} severity={toast.type} variant="filled" sx={{ width: '100%' }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
+    </ToastContext.Provider>
   );
 };
 
-export default SuccessToast;
+export const useToast = () => useContext(ToastContext);
+

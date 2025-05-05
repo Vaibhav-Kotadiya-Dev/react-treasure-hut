@@ -1,0 +1,55 @@
+.payment-container {
+    background-color: #ffffff;
+    padding: 8rem;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .success-image {
+    width: 200px;
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .success-message {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .adventure-text {
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .back-button {
+    background-color: #2b2c30 !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-transform: none !important;
+    padding: 0.7rem 2rem !important;
+    border-radius: 6px;
+  }
+  
+  .back-button:hover {
+    background-color: #1f2023 !important;
+  }
+  
+  /* 📱 Responsive */
+  @media (max-width: 600px) {
+    .payment-container {
+      padding: 2rem 1.2rem;
+    }
+  
+    .success-image {
+      width: 140px;
+    }
+  
+    .back-button {
+      width: 100%;
+    }
+  }
+  

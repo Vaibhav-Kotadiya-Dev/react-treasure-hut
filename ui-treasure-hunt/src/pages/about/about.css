@@ -1,0 +1,92 @@
+.about-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px;
+    background-color: #2b2c30;
+    color: white;
+    flex-wrap: wrap;
+  }
+  
+  .about-text {
+    max-width: 50%;
+  }
+  
+  .about-text h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  
+  .about-text ol {
+    padding-left: 1rem;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  
+  .about-cloud {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    margin-left: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .cloud-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+  
+  .cloud-img-inside {
+    width: 200px;
+    border-radius: 8px;
+    z-index: 1;
+  }
+  
+  /* 🔁 Responsive for mobile */
+  @media (max-width: 768px) {
+    .about-container {
+      flex-direction: column;
+      padding: 40px 20px;
+    }
+  
+    .about-text {
+      max-width: 100%;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+  
+    .about-cloud {
+        position: relative;
+        width: 320px; /* ⬅️ increased from 260px */
+        height: 320px;
+        margin: 0 auto;
+      }
+    
+      .cloud-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        z-index: 0;
+      }
+    
+      .cloud-img-inside {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100px;
+        height: auto;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        border-radius: 8px;
+      }
+
+  }
+  
+  

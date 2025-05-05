@@ -1,0 +1,71 @@
+.booking-wrapper {
+    background-color: #ffffff;
+    padding: 2rem;
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .form-title {
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-label {
+    font-weight: bold;
+  }
+  
+  .form-input {
+    background-color: #f2f2f2;
+    border-radius: 4px;
+  }
+  
+  .price-text {
+    font-size: 1rem;
+    margin-top: 0.3rem;
+  }
+  
+  .pay-button {
+    background-color: #2b2c30 !important;
+    color: white !important;
+    text-transform: none !important;
+    font-weight: bold !important;
+    padding: 0.75rem 1rem !important;
+  }
+  
+  .pay-button:hover {
+    background-color: #1f2023 !important;
+  }
+
+  .pay-button.Mui-disabled {
+    background-color: #d3d3d3 !important;  /* light gray */
+    color: #888888 !important;             /* muted text */
+    cursor: not-allowed !important;
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .booking-wrapper {
+      padding: 1.5rem;
+      max-width: 90%;
+    }
+  
+    .form-input {
+      font-size: 0.9rem;
+    }
+  
+    .pay-button {
+      font-size: 0.95rem;
+    }
+  }
+  

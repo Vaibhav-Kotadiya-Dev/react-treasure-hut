@@ -1,0 +1,156 @@
+/* MAIN LAYOUT */
+.home-container {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 60px;
+    min-height: calc(100vh - 100px);
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* LEFT PANEL */
+  .left-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 50%;
+  }
+  
+  .logo {
+    width: 500px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .tagline {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .italic {
+    font-style: italic;
+  }
+  
+  .description {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 20px 0;
+    text-align: center;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .book-btn {
+    background-color: #2b2c30 !important;
+        color: #ffffff !important;
+        padding: 10px 26px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        border-radius: 6px;
+        box-shadow: none;
+  }
+  
+  .right-pane {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .yellow-blob {
+    width: 700px;
+    height: 700px;
+    background: url('../../../public/yellow_blob.png') no-repeat center/contain;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .image-grid {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .left-images {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .blob-img {
+    width: 150px;
+    height: 217px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  .tall-img {
+    width: 150px;
+    height: 252px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    color: white;
+    padding: 20px 60px;
+    font-size: 14px;
+  }
+  
+  /* 📱 Responsive layout for mobile */
+@media (max-width: 768px) {
+    .home-container {
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+  
+    .left-pane {
+      max-width: 100%;
+      margin-bottom: 40px;
+    }
+  
+    .right-pane {
+      order: 2; /* ensures it comes after left-pane */
+    }
+  
+    .yellow-blob {
+      width: 90vw;
+      height: auto;
+      background-size: contain;
+    }
+  
+    .blob-img,
+    .tall-img {
+      width: 120px;
+      height: auto;
+    }
+  
+    .logo {
+      width: 300px;
+    }
+  
+    .book-btn {
+      font-size: 12px;
+      padding: 8px 20px;
+    }
+  
+    .description {
+      font-size: 13px;
+      max-width: 90%;
+    }
+  }
+  

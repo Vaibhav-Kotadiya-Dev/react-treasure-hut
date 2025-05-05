@@ -9,4 +9,21 @@ const createStripeCheckoutSession = (dataToPost) => {
     });
 };
 
-export { createStripeCheckoutSession };
+const verifySession = (sessionId) => {
+    return axiosInstance.get(
+      "/api/payment/verify-session",
+      {
+        params: {
+          sessionId,
+        },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: false,
+      }
+    );
+}
+
+export { createStripeCheckoutSession, verifySession };
