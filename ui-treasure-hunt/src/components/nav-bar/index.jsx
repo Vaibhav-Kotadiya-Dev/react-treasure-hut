@@ -1,5 +1,4 @@
-// Navbar.jsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -8,11 +7,18 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate } from 'react-router-dom';
-import './navbar.css';
+  Divider,
+  Box,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/MenuRounded";
+import MenuCloseIcon from "@mui/icons-material/CancelRounded";
+import HomeIcon from "@mui/icons-material/Home";
+import BookOnlineIcon from "@mui/icons-material/BookOnline";
+import InfoIcon from "@mui/icons-material/Info";
+import { useNavigate } from "react-router-dom";
+import "./navbar.css";
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -31,14 +37,37 @@ const Navbar = () => {
     <>
       <AppBar position="static" className="custom-navbar">
         <Toolbar className="navbar-toolbar">
-          <IconButton edge="start" className="menu-button" onClick={toggleDrawer(true)}>
-            <MenuIcon sx={{ color: 'white' }} />
+          <IconButton
+            edge="start"
+            className="menu-button"
+            onClick={toggleDrawer(true)}
+          >
+            <MenuIcon sx={{ color: "black", fontWeight: 900, fontSize: 35 }} />
           </IconButton>
 
           <Typography
-            variant="body2"
-            className="book-now"
-            onClick={() => navigate('/book-now')}
+            variant="h6"
+            onClick={() => navigate("/book-now")}
+            sx={{
+              cursor: "pointer",
+              fontWeight: 600,
+              display: "inline-block",
+              position: "relative",
+              paddingBottom: "4px",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                width: "0%",
+                height: "2px",
+                bottom: 0,
+                left: 0,
+                backgroundColor: "white",
+                transition: "width 0.3s ease",
+              },
+              "&:hover::after": {
+                width: "100%",
+              },
+            }}
           >
             BOOK NOW
           </Typography>
@@ -47,22 +76,60 @@ const Navbar = () => {
 
       <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
         <List className="drawer-list">
-          <ListItem button onClick={() => handleNavigation('/')}> 
+          <Box
+            sx={{
+              p: 2,
+              backgroundColor: "#A76545",
+              color: "white",
+              mt: -1,
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+              Puzzle Panda
+            </Typography>
+            <IconButton
+              edge="start"
+              className="menu-button"
+              onClick={toggleDrawer(false)}
+            >
+              <MenuCloseIcon
+                sx={{ color: "white", fontWeight: 900, fontSize: 35 }}
+              />
+            </IconButton>
+          </Box>
+          <Divider />
+          <ListItem button onClick={() => handleNavigation("/")}>
+            <ListItemIcon>
+              <HomeIcon sx={{ color: "black" }} />
+            </ListItemIcon>
             <ListItemText primary="Home" />
           </ListItem>
-          <ListItem button onClick={() => handleNavigation('/book-now')}>
+          <Divider />
+          <ListItem button onClick={() => handleNavigation("/book-now")}>
+            <ListItemIcon>
+              <BookOnlineIcon sx={{ color: "black" }} />
+            </ListItemIcon>
             <ListItemText primary="Book Now" />
           </ListItem>
-          <ListItem button onClick={() => handleNavigation('/about')}>
+          <Divider />
+          <ListItem button onClick={() => handleNavigation("/about")}>
+            <ListItemIcon>
+              <InfoIcon sx={{ color: "black" }} />
+            </ListItemIcon>
             <ListItemText primary="About" />
           </ListItem>
+          <Divider />
         </List>
+        <Box
+          sx={{ mt: "auto", mr: 2, display: "flex", justifyContent: "center" }}
+        >
+          <img src={"./logo.png"} alt="Puzzle Panda" width={150} />
+        </Box>
       </Drawer>
     </>
   );
 };
 
 export default Navbar;
-
-
-

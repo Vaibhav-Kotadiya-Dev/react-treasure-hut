@@ -9,12 +9,12 @@ import BookingForm from './pages/book-now';
 import Home from './pages/home';
 import About from './pages/about';
 import { ToastProvider } from './components/toaster'; // adjust the path if needed
-
+import './style.css'
 const App = () => {
   return (
   <ToastProvider>
     <Router>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh',width:"100%" }}>
         <Navbar />
         <div style={{ flexGrow: 1 }}>
           <Routes>

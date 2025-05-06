@@ -2,14 +2,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 60px;
-    background-color: #2b2c30;
+   
+    background: linear-gradient(
+    to right,
+    #A76545 40.33% 40%,
+ 
+    white 50%
+  );
     color: white;
-    flex-wrap: wrap;
+    height: calc(100vh - 100px );
+
   }
   
   .about-text {
-    max-width: 50%;
+    width: 100%;
+    padding-left: 30px;
   }
   
   .about-text h2 {
@@ -22,15 +29,19 @@
     line-height: 1.6;
     font-size: 16px;
   }
-  
+  .right-text-wrapper {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+  }
   .about-cloud {
     position: relative;
-    width: 600px;
-    height: 600px;
-    margin-left: 40px;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
   }
   
   .cloud-image {
@@ -44,49 +55,150 @@
   }
   
   .cloud-img-inside {
-    width: 200px;
-    border-radius: 8px;
+    width: 100%;
+    height: 100%;
     z-index: 1;
+    margin-left: 'auto';
   }
   
   /* 🔁 Responsive for mobile */
   @media (max-width: 768px) {
     .about-container {
       flex-direction: column;
-      padding: 40px 20px;
+      background: white;
+      justify-content: start;
+      padding-top: 30px;
     }
   
     .about-text {
       max-width: 100%;
-      text-align: center;
-      margin-bottom: 2rem;
+      text-align: left;
     }
   
     .about-cloud {
         position: relative;
-        width: 320px; /* ⬅️ increased from 260px */
-        height: 320px;
-        margin: 0 auto;
-      }
-    
-      .cloud-image {
         width: 100%;
-        height: 100%;
-        object-fit: contain;
-        z-index: 0;
+        height: 320px;
+
       }
     
       .cloud-img-inside {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 100px;
+        width: 200px;
         height: auto;
-        transform: translate(-50%, -50%);
         z-index: 1;
         border-radius: 8px;
+        position: absolute;
+        margin-left: 16px;
       }
+
 
   }
   
   
+  .about-text {
+    max-width: 800px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  .about-text h2 {
+    font-size: 2.5rem;
+    color: #A76545;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .about-text ol {
+    counter-reset: step-counter;
+    padding-left: 0;
+    list-style: none;
+  }
+  
+  .about-text li {
+    position: relative;
+    padding-left: 3.5rem;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  
+  }
+  
+  .about-text li:before {
+    counter-increment: step-counter;
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background:black;
+    color: white;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  .about-text li:nth-child(odd):before {
+    background: black; /* Lighter purple for odd items */
+  }
+  
+  .about-text li strong {
+    color: #6a0dad;
+    font-weight: 600;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .about-text {
+      padding: 1rem;
+    }
+    
+    .about-text h2 {
+      font-size: 2rem;
+    }
+    
+    .about-text li {
+      padding-left: 2.8rem;
+      font-size: 1rem;
+    }
+    
+    .about-text li:before {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .about-container {
+      flex-direction: column;
+      background: white;
+      justify-content: start;
+      padding-top: 30px;
+    }
+  
+    .about-text {
+      max-width: 100%;
+      text-align: left;
+    }
+  
+    .about-cloud {
+        position: relative;
+        width: 100%;
+        height: 320px;
+
+      }
+    
+      .cloud-img-inside {
+        width: 200px;
+        height: auto;
+        z-index: 1;
+        border-radius: 8px;
+        position: absolute;
+        margin-left: 16px;
+      }
+  }
