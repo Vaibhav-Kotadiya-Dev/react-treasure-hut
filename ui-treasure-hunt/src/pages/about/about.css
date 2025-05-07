@@ -39,7 +39,7 @@
 .about-text li {
   position: relative;
   margin-bottom: 10px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   background-color: #f0f0f0;
   padding: 20px 0;
   border-radius: 20px;
@@ -49,6 +49,8 @@
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   color: #333;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .about-text li strong {
