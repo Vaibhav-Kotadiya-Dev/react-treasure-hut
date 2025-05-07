@@ -29,6 +29,14 @@ export default class UserSchema extends VersionSchema {
       hashedPassword: {
         type: String,
         default: null
+      },
+      fullName: {
+        type: String,
+        default: null
+      },
+      refreshToken: {
+        type: String,
+        default: null
       }
     };
     super(userSchema, options);

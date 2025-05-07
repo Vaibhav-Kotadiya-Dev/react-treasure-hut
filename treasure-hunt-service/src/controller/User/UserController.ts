@@ -73,7 +73,6 @@ class UserController {
   adminLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const { mobileNumber, password } = req.body;
-      console.log(mobileNumber, password);
       const user = await this.userRepository.get({ mobileNumber });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -91,7 +90,9 @@ class UserController {
       }
       const accessToken = generateAccessToken(user);
       const refreshToken = generateRefreshToken(user);
-
+      await this.userRepository.updateById(user._id, {
+        refreshToken
+      })
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: this.config.NODE_ENV === "production",
@@ -103,6 +104,17 @@ class UserController {
       console.error("Login error:", error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
+  };
+
+  adminLogout = async (req: Request, res: Response, next: NextFunction) => {
+     try {
+      const token = req?.headers?.authorization?.split(' ')[1];
+
+      res.clearCookie("refreshToken");
+     } catch (error){
+        next(error);
+     }
+      
   };
 
   list = async (req: Request, res: Response, next: NextFunction): Promise<any> => {

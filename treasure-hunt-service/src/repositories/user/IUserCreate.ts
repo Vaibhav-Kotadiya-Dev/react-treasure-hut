@@ -18,4 +18,6 @@ export default interface IUserCreate {
     userType: UserType;
     permissions: Permission[];
     hashedPassword: string;
+    fullName: string;
+    refreshToken: string;
 };

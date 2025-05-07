@@ -46,6 +46,9 @@ export const seedQuestionsIfEmpty = async (): Promise<void> => {
         type: "text",
         sequence: 3,
         isStart: false,
+        voucher: {
+          voucherText: 'Go inside and show this voucher, tour the shop, and claim your free raunchy gift!'
+        }
       },
       {
         clue: "She may have ruled with a stiff upper lip, but Queen Victoria's private diaries have been described as the Victorian 50 Shades of Grey - detailing her lust for Prince Albert. Find her statue and tell me: is she alone or with her royal consort?",
@@ -76,6 +79,9 @@ export const seedQuestionsIfEmpty = async (): Promise<void> => {
         type: "text",
         sequence: 6,
         isStart: false,
+        voucher: {
+          voucherText: 'Head inside, flash this voucher, and claim your victory drink—you earned it!'
+        }
       },
     ];
 

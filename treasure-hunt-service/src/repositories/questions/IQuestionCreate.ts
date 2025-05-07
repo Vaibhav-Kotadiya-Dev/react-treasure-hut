@@ -9,5 +9,8 @@ export interface IQuestion extends Document {
     toleranceMeters?: number;
     sequence: number;
     isStart: boolean;
+    voucher?: {
+      voucherText: string;
+    }
   }
   

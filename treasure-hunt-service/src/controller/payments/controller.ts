@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
+import Stripe from "stripe";
 import IConfig from "../../config/IConfig";
 import config from '../../config/configuration';
-import Stripe from "stripe";
 import PaymentRepository from '../../repositories/payments/PaymentRepositories';
 import UserRepository from "../../repositories/user/UserRepositories";
 import IUserModel from "../../repositories/user/IUserModel";
@@ -32,7 +32,7 @@ class PaymentController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const { amount = 100, registrationDate, mobileNumber, teamMemberCount } = req.body;
+      const { amount = 100, registrationDate, mobileNumber, teamMemberCount, fullName } = req.body;
       if (!amount || !mobileNumber) {
         const error = new Error("Missing required fields") as any;
         error.statusCode = 400;
@@ -49,25 +49,26 @@ class PaymentController {
            error.statusCode = 409;
            throw error;
         }
-      }
+      }const amountInPaiseOrCents = Math.round(parseFloat(amount) * 100);
       const session = await this.stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
+        payment_method_types: ["card"], // provide all payments methods
         mode: "payment",
         line_items: [
           {
             price_data: {
-              currency: "usd",
+              currency: "gbp",
               product_data: { name: "Treasure Hunt Entry" },
-              unit_amount: amount,
+              unit_amount: amountInPaiseOrCents,
             },
             quantity: 1,
           },
         ],
-        success_url: "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}",
+        success_url: "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}", // change url for production
         metadata: {
           mobileNumber,
           registrationDate,
-          teamMemberCount
+          teamMemberCount,
+          fullName
         },
       });
       const checkoutUrl = session.url;
@@ -99,6 +100,7 @@ class PaymentController {
           mobileNumber?: string;
           registrationDate?: string;
           teamMemberCount?: string;
+          fullName?: string
         };
         console.log(`:::METADATA::::${JSON.stringify(metadata)}`);
         const mobileNumber = metadata?.mobileNumber;
@@ -108,6 +110,7 @@ class PaymentController {
         const teamMemberCount = metadata?.teamMemberCount
           ? parseInt(metadata.teamMemberCount, 10)
           : 2;
+        const fullName = metadata?.fullName;
         const payment = await this.paymentRepository.create({
           mobileNumber,
           stripeSessionId: session.id,
@@ -126,6 +129,7 @@ class PaymentController {
             isPaymentError: false,
             registrationDate: regDate.toISOString(),
             teamMemberCount,
+            fullName,
             userType: UserType.USER,
             permissions: [Permission.CREATE, Permission.READ],
           });
@@ -147,6 +151,7 @@ class PaymentController {
             { mobileNumber },
             { currentSequence: question.sequence }
           );
+          console.log(question, 'inside');
         }
         return res.status(200).json({ success: true, payment });
       } else {

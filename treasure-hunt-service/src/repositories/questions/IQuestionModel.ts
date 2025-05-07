@@ -11,4 +11,7 @@ export default interface IQuestionModel extends IVersionSchema {
   toleranceMeters?: number;
   sequence: number;
   isStart: boolean;
+  voucher?: {
+    voucherText: string;
+  };
 };

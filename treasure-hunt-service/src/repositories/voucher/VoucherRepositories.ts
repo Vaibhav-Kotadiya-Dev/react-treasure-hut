@@ -1,11 +1,11 @@
-import { answerModel } from './AnswerModel';
+import { voucherModel } from './VoucherModel';
 import * as mongoose from 'mongoose';
-import IUserModel from './IAnswerModel';
+import IUserModel from './IVoucherModel';
 import VersionRepository from '../versionRepositories/VersionRepository';
 
 export default class AnswerRepository extends VersionRepository<IUserModel, mongoose.Model<IUserModel>> {
   constructor() {
-    super(answerModel);
+    super(voucherModel);
   }
 
   static generateObjectId() {

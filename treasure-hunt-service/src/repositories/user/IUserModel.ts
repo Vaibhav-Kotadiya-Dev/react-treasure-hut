@@ -18,4 +18,6 @@ export default interface IUserModel extends IVersionSchema {
   userType: UserType;
   permissions: Permission[];
   hashedPassword: string;
+  fullName: string;
+  refreshToken: string;
 };

@@ -56,7 +56,6 @@ class MessengerController {
     try {
       const { Body = "", From = "" } = req.body;
       let latestMessage = "";
-      console.log(Body, From);
       if (Body) {
         latestMessage = Body;
         const phone = parsePhoneNumberWithError(
@@ -77,9 +76,7 @@ class MessengerController {
         if (now < new Date(userData.registrationDate)) {
           await sendWhatsAppMessage(
             phone,
-            `🕒 Your treasure hunt window opens on ${new Date(
-              userData.registrationDate
-            ).toLocaleString()}`
+            `There is no booking available for today`
           );
         } else {
           const currentSequence = userData.currentSequence;
@@ -95,7 +92,9 @@ class MessengerController {
               sequence: currentSequence,
             });
             if (!question) throw new Error("Question not found");
-
+            if(currentSequence === 3 || currentSequence === 6){
+              await sendWhatsAppMessage(phone, question?.voucher?.voucherText);
+            }
             if (latestMessage && question?.answer?.length) {
               const isCorrect = isAnswerCloseEnough(
                 latestMessage,
@@ -111,7 +110,7 @@ class MessengerController {
                     currentSequence: nextSequence,
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
-                  await sendWhatsAppMessage(phone, nextQuestion?.clue);
+                  await sendWhatsAppMessage(phone, `${nextQuestion?.clue}`);
                 } else {
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
@@ -128,7 +127,8 @@ class MessengerController {
                 await this.userRepository.updateById(userData._id, {
                   currentAttempts: 1,
                 });
-                await sendWhatsAppMessage(phone, question.hint);
+                const hint = `That's not the correct answer. Here's a hint: ${question.hint}`;
+                await sendWhatsAppMessage(phone, hint);
               } else {
                 const nextSequence = currentSequence + 1;
                 if (nextSequence < TOTAL_SEQUENCE) {
@@ -140,8 +140,8 @@ class MessengerController {
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
                   const correctAnswers = question?.answer?.length === 1 ? question?.answer[0]: question?.answer.join(",");
-                  await sendWhatsAppMessage(phone, `✅ Correct Answer: ${correctAnswers}`);
-                  await sendWhatsAppMessage(phone, nextQuestion?.clue);
+                  await sendWhatsAppMessage(phone, `Great job — that's the correct answer! : ${correctAnswers}`);
+                  await sendWhatsAppMessage(phone, `Next question: ${nextQuestion?.clue}`);
                 } else {
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
