@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 
 const Home = () => {
   const navigate = useNavigate();
+
   return (
     <div className="home-container">
       <div className="right-pane">
@@ -28,7 +29,12 @@ const Home = () => {
           day out!
         </p>
         <div style={{ textAlign: "center" }}>
-          <Button className={"book-btn"} onClick={() => navigate("/book-now")}>
+          <Button
+            className={"pay-button"}
+            color="black"
+            sx={{ fontWeight: 700, width: 200 }}
+            onClick={() => navigate("/book-now")}
+          >
             {" "}
             BOOK NOW
           </Button>

@@ -1,10 +1,9 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from "react";
-import { Box,  Container, Grid,  Typography } from "@mui/material";
-import EmailIcon from "@mui/icons-material/Email"
+import { Box, Container, Grid, Typography } from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
 
 const MiroFooter = () => {
- 
   return (
     <Box
       sx={{
@@ -18,8 +17,6 @@ const MiroFooter = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4} justifyContent={"space-between"}>
-        
-
           <Grid item xs={12} md={4}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <EmailIcon sx={{ mr: 1, fontSize: "2rem", color: "black" }} />
@@ -48,7 +45,7 @@ const MiroFooter = () => {
               width={150}
               height={150}
               style={{
-                mixBlendMode: "multiply", 
+                mixBlendMode: "multiply",
                 background: "transparent",
                 objectFit: "contain",
               }}

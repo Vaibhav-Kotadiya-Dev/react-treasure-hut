@@ -89,13 +89,33 @@ const BookingForm = () => {
                 </Typography>
                 <TextField
                   type="number"
-                  placeholder="?"
+                  placeholder="Number of participants"
                   fullWidth
-                  value={participants}
-                  onChange={(e) => setParticipants(e.target.value)}
+                  value={participants === null ? "" : participants}
+                  onChange={(e) => {
+                    let value = e.target.value;
+
+                    if (value === "") {
+                      setParticipants(null);
+                      return;
+                    }
+
+                    if (/^0\d+/.test(value)) return;
+
+                    if (value.length > 10) return;
+
+                    setParticipants(Number(value));
+                  }}
                   onBlur={(e) => handleError("participants", e.target.value)}
                   error={!!errors.participants}
                   helperText={errors.participants}
+                  sx={{
+                    "& .MuiFormHelperText-root": {
+                      color: "error.main",
+                      marginLeft: 0.5,
+                      fontSize: "0.75rem",
+                    },
+                  }}
                 />
               </div>
 
@@ -105,7 +125,6 @@ const BookingForm = () => {
                 </Typography>
                 <DatePicker
                   value={registrationDate}
-                  label="Registration Date"
                   minDate={dayjs()}
                   format="DD/MM/YYYY"
                   onChange={(newValue) => setRegistrationDate(newValue)}
@@ -114,63 +133,97 @@ const BookingForm = () => {
               </div>
 
               <div className="form-section">
-                <Typography className="form-label">
-                  Contact info for team lead:
-                </Typography>
+                <Typography className="form-label">Full Name</Typography>
                 <TextField
                   placeholder="Full name"
                   fullWidth
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  onBlur={(e) => handleError("fullName", e.target.value)}
-                  error={!!errors.fullName}
-                  helperText={errors.fullName}
-                  sx={{ mb: 2 }}
+                  onBlur={(e) => handleError("Full name", e.target.value)}
+                  error={!!errors["Full name"]}
+                  helperText={errors["Full name"]}
+                  sx={{
+                    "& .MuiFormHelperText-root": {
+                      color: "error.main",
+                      marginLeft: 0.5,
+                      fontSize: "0.75rem",
+                    },
+                  }}
                 />
+              </div>
+              <Box className="form-section">
+                <Typography className="form-label">Mobile Number</Typography>
                 <TextField
-                  placeholder="WhatsApp number"
+                  placeholder="Mobile number"
                   fullWidth
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  onBlur={(e) => handleError("whatsapp", e.target.value)}
-                  error={!!errors.whatsapp}
-                  helperText={errors.whatsapp}
-                />
-              </div>
-              <div className="form-section-price">
-                <Typography className="form-label-price">PRICE:</Typography>
-                <Box
+                  onBlur={(e) => handleError("Mobile number", e.target.value)}
+                  error={!!errors["Mobile number"]}
+                  helperText={errors["Mobile number"]}
                   sx={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 1.5,
-                    backgroundColor: "#295F98",
-                    color: "white",
-                    px: 2,
-                    py: 1,
-                    borderRadius: 1,
-                    mb: 3,
+                    "& .MuiFormHelperText-root": {
+                      color: "error.main",
+                      marginLeft: 0.5,
+                      fontSize: "0.75rem",
+                    },
+                  }}
+                />
+              </Box>
+            </div>
+            <div className="form-section-price">
+              <Typography
+                className="form-label-price"
+                variant="subtitle2"
+                sx={{
+                  color: "gray",
+                  fontWeight: 600,
+                  letterSpacing: "0.05em",
+                  marginRight: 2,
+                }}
+              >
+                TOTAL PRICE:
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  color: "black",
+                }}
+              >
+                <Typography
+                  color="black"
+                  variant="body1"
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
                   }}
                 >
-                  <Typography variant="body2">
-                    £10 × {participants || "?"}
-                  </Typography>
-                  =
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    £{total}
-                  </Typography>
-                </Box>
-              </div>
+                  £10 × {participants || "0"}
+                </Typography>
+
+                <Box component="span">=</Box>
+
+                <Typography
+                  variant="h6"
+                  sx={{ fontSize: { xs: "14px", sm: "1rem" } }}
+                >
+                  £{total || "0"}
+                </Typography>
+              </Box>
             </div>
-            <Button
-              className="pay-button"
-              variant="contained"
-              disabled={!isFormValid()}
-              onClick={handleOnChange}
-            >
-              PAY NOW
-            </Button>
+            <Box sx={{ display: "flex", width: "100%" }}>
+              <Button
+                className="pay-button"
+                sx={{ width: "100%", color: "black", fontWeight: 700 }}
+                disabled={!isFormValid()}
+                onClick={handleOnChange}
+              >
+                PAY NOW
+              </Button>
+            </Box>
           </Box>
           <Box
             sx={{

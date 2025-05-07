@@ -8,7 +8,7 @@ import { useToast } from "../../components/toaster";
 const PaymentSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isValid, setIsValid] = useState(null); // null = loading, false = rejected
+  const [isValid, setIsValid] = useState(null); 
   const query = new URLSearchParams(location.search);
   const sessionId = query.get("session_id");
   const { showToast } = useToast();
@@ -28,6 +28,7 @@ const PaymentSuccess = () => {
         })
         .catch(() => navigate("/"));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   if (isValid === null) {
@@ -38,6 +39,7 @@ const PaymentSuccess = () => {
       </Box>
     );
   }
+  // eslint-disable-next-line eqeqeq
   if (isValid == false) {
     return (
       <Box className="payment-container" sx={{ textAlign: "center" }}>
@@ -61,8 +63,8 @@ const PaymentSuccess = () => {
           Get ready to begin your adventure!
         </Typography>
         <Button
-          variant="contained"
-          className="back-button"
+          color="black"
+          className="pay-button"
           onClick={() => navigate("/")}
         >
           Back Home

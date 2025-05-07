@@ -95,7 +95,23 @@ const Navbar = () => {
               onClick={toggleDrawer(false)}
             >
               <MenuCloseIcon
-                sx={{ color: "white", fontWeight: 900, fontSize: 35 }}
+                sx={{
+                  color: "white",
+                  fontWeight: 900,
+                  fontSize: 35,
+                  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transform: "rotate(0deg)",
+                  "&:hover": {
+                    color: "#FEF3E2",
+                    cursor: "pointer",
+                    transform: "rotate(90deg)",
+                    scale: "1.1",
+                  },
+                  "&:active": {
+                    transform: "rotate(90deg) scale(0.95)",
+                    transition: "transform 0.1s ease",
+                  },
+                }}
               />
             </IconButton>
           </Box>

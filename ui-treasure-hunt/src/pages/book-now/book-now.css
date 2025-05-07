@@ -1,9 +1,9 @@
 .booking-main {
-  height: calc(100vh);
   display: flex;
   justify-content: center;
   align-items: center;
   background: linear-gradient(to right, #a76545 40.33% 50%, white 50%);
+  height: 100vh;
 }
 .card-main {
   background-color: #ffffff;
@@ -39,6 +39,7 @@
 
 .form-label {
   font-weight: bold;
+  color: gray;
 }
 
 .form-input {
@@ -48,50 +49,73 @@
 
 .price-text {
   font-size: 1rem;
-  margin-top: 0.3rem;
 }
 .form-section-price {
   border: 1px solid silver;
-  padding: 2px;
+  padding: 10px;
   display: flex;
-  flex-direction: column;
-  gap: 30px;
+  justify-content: start;
+  align-items: center;
+  padding-left: 10px;
+  border-radius: 4px;
 }
 .form-label-price {
-  background-color: #102e50;
-  padding: 10px;
-  color: white;
+  color: black;
 }
 .pay-button {
-  background-color: #2b2c30 !important;
+  background-color: #27548a !important;
   color: white !important;
   text-transform: none !important;
   font-weight: bold !important;
   padding: 0.75rem 1rem !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 1s ease-in-out !important;
+}
+
+.pay-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  );
+  transform: skewX(-20deg);
+  transition: all 1s ease;
+}
+
+.pay-button:hover::before {
+  left: 130%;
 }
 
 .pay-button:hover {
-  background-color: #1f2023 !important;
+  background-color: #27548a !important;
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .pay-button.Mui-disabled {
-  background-color: #d3d3d3 !important; /* light gray */
-  color: #888888 !important; /* muted text */
+  background-color: #d3d3d3 !important;
+  color: #888888 !important;
   cursor: not-allowed !important;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .booking-main {
     background: white;
+    padding: 40px 0;
   }
   .booking-wrapper {
-    padding: 1.5rem;
     max-width: 100%;
     width: 100%;
   }
   .card-main {
-    width: 90%;
+    width: 95%;
   }
   .form-input {
     font-size: 0.9rem;
@@ -103,6 +127,10 @@
   .form-section-main {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
+  }
+  .form-section-price {
+    flex-wrap: wrap;
+    gap: 10px;
   }
 }
