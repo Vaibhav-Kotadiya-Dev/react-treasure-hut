@@ -23,18 +23,22 @@ const BookingForm = () => {
 
   const handleError = (key, value) => {
     let message = "";
-
+    const mobileRegex = /^(?:[6-9]\d{9}|07\d{9})$/;
+    const fullNameRegex = /^[A-Za-z\s'-]{2,50}$/;
     if (!value || (typeof value === "string" && value.trim() === "")) {
-      message = `${key} is required.`;
-    } else if (
-      key === "whatsapp" &&
-      !/^\+?[1-9]\d{6,14}$/.test(String(value).replace(/\s/g, ""))
-    ) {
+      const errorKeysName = {
+        participants: "Number of participants",
+        fullName: "Full Name",
+        mobileNumber: "Mobile number",
+      };
+      message = `${errorKeysName[key]} is required.`;
+    } else if (key === "mobileNumber" && !mobileRegex.test(value)) {
       message = "Enter a valid WhatsApp number.";
     } else if (key === "participants" && Number(value) <= 0) {
       message = "Participants must be more than 0.";
+    } else if (key === "fullName" && (typeof value !== "string" || !fullNameRegex.test(value))) {
+      message = "Enter a valid name.";
     }
-
     setErrors((prev) => ({
       ...prev,
       [key]: message,
@@ -58,6 +62,8 @@ const BookingForm = () => {
         mobileNumber: whatsapp,
         registrationDate,
         teamMemberCount: participants,
+        amount: total,
+        fullName
       });
       if (checkoutSessionResponse.status === 200) {
         const {
@@ -94,16 +100,13 @@ const BookingForm = () => {
                   value={participants === null ? "" : participants}
                   onChange={(e) => {
                     let value = e.target.value;
-
                     if (value === "") {
                       setParticipants(null);
                       return;
                     }
-
                     if (/^0\d+/.test(value)) return;
-
                     if (value.length > 10) return;
-
+                    if (Number(value) <= 0) return;
                     setParticipants(Number(value));
                   }}
                   onBlur={(e) => handleError("participants", e.target.value)}
@@ -139,9 +142,9 @@ const BookingForm = () => {
                   fullWidth
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  onBlur={(e) => handleError("Full name", e.target.value)}
-                  error={!!errors["Full name"]}
-                  helperText={errors["Full name"]}
+                  onBlur={(e) => handleError("fullName", e.target.value)}
+                  error={!!errors["fullName"]}
+                  helperText={errors["fullName"]}
                   sx={{
                     "& .MuiFormHelperText-root": {
                       color: "error.main",
@@ -158,9 +161,9 @@ const BookingForm = () => {
                   fullWidth
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  onBlur={(e) => handleError("Mobile number", e.target.value)}
-                  error={!!errors["Mobile number"]}
-                  helperText={errors["Mobile number"]}
+                  onBlur={(e) => handleError("mobileNumber", e.target.value)}
+                  error={!!errors["mobileNumber"]}
+                  helperText={errors["mobileNumber"]}
                   sx={{
                     "& .MuiFormHelperText-root": {
                       color: "error.main",

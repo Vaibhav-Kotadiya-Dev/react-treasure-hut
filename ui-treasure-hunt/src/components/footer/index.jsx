@@ -71,3 +71,4 @@ const MiroFooter = () => {
 };
 
 export default MiroFooter;
+

@@ -1,0 +1,59 @@
+.admin-login-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    padding: 20px;
+  }
+  
+  .admin-login-wrapper-bg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .admin-login-paper {
+    width: 360px;
+    padding: 32px 24px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .admin-login-avatar {
+    margin-bottom: 8px;
+  }
+  
+  .admin-login-title {
+    font-weight: 600;
+    color: #1c1e21;
+  }
+  
+  .admin-login-button {
+    margin-top: 24px;
+    height: 44px;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: none;
+  }
+  
+  /* Responsive */
+  @media (max-width: 480px) {
+    .admin-login-paper {
+      width: 100%;
+      padding: 24px 16px;
+    }
+  }
+  
+  
+  
+  
