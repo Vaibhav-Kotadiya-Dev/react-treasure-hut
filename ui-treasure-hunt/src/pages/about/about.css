@@ -1,7 +1,7 @@
 .about-container {
   display: grid;
   grid-template-columns: 50% 50%;
-  background: linear-gradient(to right, #a76545 50%, white 50%);
+  background: linear-gradient(to right, #DBBA2C 50%, white 50%);
   color: white;
   height: 100vh;
 }
@@ -14,7 +14,6 @@
   flex-direction: column;
   justify-content: center;
   max-width: 800px;
-  font-family: "Helvetica Neue", Arial, sans-serif;
   color: #333;
   line-height: 1.6;
 }
@@ -46,17 +45,12 @@
   text-align: center;
   align-items: center;
   justify-content: center;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   color: #333;
   padding-left: 16px;
   padding-right: 16px;
 }
 
-.about-text li strong {
-  color: #6a0dad;
-  font-weight: 600;
-}
+
 
 .right-text-wrapper {
   display: flex;
@@ -157,7 +151,6 @@
     flex-direction: column;
     justify-content: center;
     max-width: 800px;
-    font-family: "Helvetica Neue", Arial, sans-serif;
     color: #333;
     line-height: 1.6;
     margin: 60px 0px;

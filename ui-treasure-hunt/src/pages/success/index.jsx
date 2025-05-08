@@ -4,7 +4,7 @@ import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import "./success.css";
 import { verifySession } from "../../api/payment";
 import { useToast } from "../../components/toaster";
-
+import CancelIcon from '@mui/icons-material/Cancel';
 const PaymentSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,11 +39,14 @@ const PaymentSuccess = () => {
       </Box>
     );
   }
-  // eslint-disable-next-line eqeqeq
+  // // eslint-disable-next-line eqeqeq
   if (isValid == false) {
     return (
+      <Box className="success-main">
       <Box className="payment-container" sx={{ textAlign: "center" }}>
-        <Typography mt={2}>Payment failed. Please try again.</Typography>
+        <CancelIcon sx={{width:130,height:130,color:'red'}}/>
+        <Typography mt={2} sx={{fontWeight:700,color:'red'}}>Payment failed. Please try again.</Typography>
+      </Box>
       </Box>
     );
   }

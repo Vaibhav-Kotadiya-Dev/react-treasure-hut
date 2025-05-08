@@ -79,7 +79,7 @@ const Navbar = () => {
           <Box
             sx={{
               p: 2,
-              backgroundColor: "#A76545",
+              backgroundColor: "#DBBA2C",
               color: "white",
               mt: -1,
               display: "flex",
@@ -130,11 +130,11 @@ const Navbar = () => {
             <ListItemText primary="Book Now" />
           </ListItem>
           <Divider />
-          <ListItem button onClick={() => handleNavigation("/about")}>
+          <ListItem button onClick={() => handleNavigation("/how-it-works")}>
             <ListItemIcon>
               <InfoIcon sx={{ color: "black" }} />
             </ListItemIcon>
-            <ListItemText primary="About" />
+            <ListItemText primary="How It Works" />
           </ListItem>
           <Divider />
         </List>

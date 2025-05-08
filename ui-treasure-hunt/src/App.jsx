@@ -13,7 +13,7 @@ const App = () => {
   useEffect(() => {
     const pageTitles = {
       "/": "",
-      "/about": "about",
+      "/how-it-works": "How it works",
       "/book-now": "Book now",
       "/success": "success",
     };
@@ -40,7 +40,7 @@ const App = () => {
             {/* <Route path="/admin/users" element={<AdminUserTable />} />
             <Route path="/admin/login" element={<AdminLogin />} /> */}
             <Route path="/book-now" element={<BookingForm />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/how-it-works" element={<About />} />
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
           </Routes>
