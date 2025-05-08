@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to right, #a76545 40.33% 50%, white 50%);
+  background: linear-gradient(to right, #DBBA2C 40.33% 50%, white 50%);
   height: 100vh;
 }
 .card-main {
