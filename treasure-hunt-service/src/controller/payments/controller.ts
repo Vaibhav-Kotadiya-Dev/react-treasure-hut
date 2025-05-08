@@ -5,7 +5,7 @@ import config from '../../config/configuration';
 import PaymentRepository from '../../repositories/payments/PaymentRepositories';
 import UserRepository from "../../repositories/user/UserRepositories";
 import IUserModel from "../../repositories/user/IUserModel";
-import { Permission, UserType } from "../../utils/constant";
+import { Permission, UserType, WELCOME_MESSAGE } from "../../utils/constant";
 import sendWhatsAppMessage from "../../libs/twilio-client";
 import QuestionRepository from "../../repositories/questions/QuestionRepositories";
 
@@ -146,12 +146,12 @@ class PaymentController {
             error.statusCode = 404;
             throw error;
           }
+          await sendWhatsAppMessage(userResponse?.mobileNumber, WELCOME_MESSAGE);
           await sendWhatsAppMessage(userResponse?.mobileNumber, question?.clue);
           await this.userRepository.update(
             { mobileNumber },
             { currentSequence: question.sequence }
           );
-          console.log(question, 'inside');
         }
         return res.status(200).json({ success: true, payment });
       } else {

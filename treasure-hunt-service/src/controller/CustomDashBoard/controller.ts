@@ -9,6 +9,8 @@ import {
   DEFAULT_ATTEMPT,
   MAX_SEQUENCE,
   MIN_SEQUENCE,
+  NO_BOOKING_TODAY,
+  QUIZ_COMPLETED,
   TOTAL_SEQUENCE,
 } from "../../utils/constant";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
@@ -76,7 +78,7 @@ class MessengerController {
         if (now < new Date(userData.registrationDate)) {
           await sendWhatsAppMessage(
             phone,
-            `There is no booking available for today`
+            NO_BOOKING_TODAY
           );
         } else {
           const currentSequence = userData.currentSequence;
@@ -127,7 +129,7 @@ class MessengerController {
                 await this.userRepository.updateById(userData._id, {
                   currentAttempts: 1,
                 });
-                const hint = `That's not the correct answer. Here's a hint: ${question.hint}`;
+                const hint = `❌ That's not the correct answer.💡 Here's a hint: ${question.hint}`;
                 await sendWhatsAppMessage(phone, hint);
               } else {
                 const nextSequence = currentSequence + 1;
@@ -140,8 +142,8 @@ class MessengerController {
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
                   const correctAnswers = question?.answer?.length === 1 ? question?.answer[0]: question?.answer.join(",");
-                  await sendWhatsAppMessage(phone, `Great job — that's the correct answer! : ${correctAnswers}`);
-                  await sendWhatsAppMessage(phone, `Next question: ${nextQuestion?.clue}`);
+                  await sendWhatsAppMessage(phone, `✅ Great job — that's the correct answer! 🎯🎉 : ${correctAnswers}`);
+                  await sendWhatsAppMessage(phone, `👉 Next question: Get ready for the next clue! 🧠🕵️‍♂️ : ${nextQuestion?.clue}`);
                 } else {
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
@@ -157,7 +159,10 @@ class MessengerController {
               }
             }
           } else {
-            throw new Error("Invalid current sequence");
+            await sendWhatsAppMessage(
+              phone,
+              QUIZ_COMPLETED
+            );
           }
         }
       }
