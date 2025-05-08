@@ -2,15 +2,18 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import PhoneInput from "react-phone-number-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
 import dayjs from "dayjs";
 import "./book-now.css";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createStripeCheckoutSession } from "../../api/payment";
 import { useToast } from "../../components/toaster";
+import "react-phone-number-input/style.css";
 
 const BookingForm = () => {
-  const [participants, setParticipants] = useState(1);
+  const [participants, setParticipants] = useState(2);
   const [registrationDate, setRegistrationDate] = useState(dayjs());
   const [fullName, setFullName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -23,20 +26,22 @@ const BookingForm = () => {
 
   const handleError = (key, value) => {
     let message = "";
-    const mobileRegex = /^(?:[6-9]\d{9}|07\d{9})$/;
     const fullNameRegex = /^[A-Za-z\s'-]{2,50}$/;
-    if (!value || (typeof value === "string" && value.trim() === "")) {
+    if (!value || (typeof value === "string" && value?.trim() === "")) {
       const errorKeysName = {
         participants: "Number of participants",
         fullName: "Full Name",
         mobileNumber: "Mobile number",
       };
       message = `${errorKeysName[key]} is required.`;
-    } else if (key === "mobileNumber" && !mobileRegex.test(value)) {
+    } else if (key === "mobileNumber" && !isValidPhoneNumber(value)) {
       message = "Enter a valid WhatsApp number.";
-    } else if (key === "participants" && Number(value) <= 0) {
-      message = "Participants must be more than 0.";
-    } else if (key === "fullName" && (typeof value !== "string" || !fullNameRegex.test(value))) {
+    } else if (key === "participants" && Number(value) <= 1) {
+      message = "Minimum 2 participants are required";
+    } else if (
+      key === "fullName" &&
+      (typeof value !== "string" || !fullNameRegex.test(value))
+    ) {
       message = "Enter a valid name.";
     }
     setErrors((prev) => ({
@@ -47,15 +52,15 @@ const BookingForm = () => {
 
   const isFormValid = () => {
     return (
-      participants &&
-      fullName.trim() !== "" &&
-      whatsapp.trim() !== "" &&
+      Number(participants) > 1 &&
+      fullName?.trim() !== "" &&
+      whatsapp?.trim() !== "" &&
       registrationDate &&
       Object.values(errors).every((val) => val === "")
     );
   };
 
-  const handleOnChange = async (e) => {
+  const handleOnClick = async (e) => {
     e.preventDefault();
     try {
       const checkoutSessionResponse = await createStripeCheckoutSession({
@@ -63,7 +68,7 @@ const BookingForm = () => {
         registrationDate,
         teamMemberCount: participants,
         amount: total,
-        fullName
+        fullName,
       });
       if (checkoutSessionResponse.status === 200) {
         const {
@@ -108,6 +113,7 @@ const BookingForm = () => {
                     if (value.length > 10) return;
                     if (Number(value) <= 0) return;
                     setParticipants(Number(value));
+                    handleError("participants", value);
                   }}
                   onBlur={(e) => handleError("participants", e.target.value)}
                   error={!!errors.participants}
@@ -141,7 +147,10 @@ const BookingForm = () => {
                   placeholder="Full name"
                   fullWidth
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    handleError("fullName", e.target.value);
+                  }}
                   onBlur={(e) => handleError("fullName", e.target.value)}
                   error={!!errors["fullName"]}
                   helperText={errors["fullName"]}
@@ -156,22 +165,29 @@ const BookingForm = () => {
               </div>
               <Box className="form-section">
                 <Typography className="form-label">Mobile Number</Typography>
-                <TextField
-                  placeholder="Mobile number"
-                  fullWidth
+                <PhoneInput
+                  international
+                  defaultCountry="IN"
+                  placeholder="Enter phone number"
+                  className=""
                   value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
-                  onBlur={(e) => handleError("mobileNumber", e.target.value)}
-                  error={!!errors["mobileNumber"]}
-                  helperText={errors["mobileNumber"]}
-                  sx={{
-                    "& .MuiFormHelperText-root": {
-                      color: "error.main",
-                      marginLeft: 0.5,
-                      fontSize: "0.75rem",
-                    },
+                  onChange={(value) => {
+                    setWhatsapp(value);
+                    handleError("mobileNumber", value);
                   }}
+                  onBlur={(e) => handleError("mobileNumber", e.target.value)}
                 />
+                {errors["mobileNumber"] && (
+                  <div
+                    style={{
+                      color: "#d32f2f",
+                      fontSize: "0.75rem",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors["mobileNumber"]}
+                  </div>
+                )}
               </Box>
             </div>
             <div className="form-section-price">
@@ -222,7 +238,7 @@ const BookingForm = () => {
                 className="pay-button"
                 sx={{ width: "100%", color: "black", fontWeight: 700 }}
                 disabled={!isFormValid()}
-                onClick={handleOnChange}
+                onClick={handleOnClick}
               >
                 PAY NOW
               </Button>
