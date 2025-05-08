@@ -7,10 +7,12 @@ import UserRepository from "../../repositories/user/UserRepositories";
 import { isAnswerCloseEnough } from "../../utils/isAnswerCloseEnough";
 import {
   DEFAULT_ATTEMPT,
+  DEFAULT_SEQUENCE,
   MAX_SEQUENCE,
   MIN_SEQUENCE,
   NO_BOOKING_TODAY,
   QUIZ_COMPLETED,
+  QUIZ_START_KEYWORD,
   TOTAL_SEQUENCE,
 } from "../../utils/constant";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
@@ -76,15 +78,18 @@ class MessengerController {
         if (!userData) throw new Error("User not found");
         const now = new Date();
         if (now < new Date(userData.registrationDate)) {
-          await sendWhatsAppMessage(
-            phone,
-            NO_BOOKING_TODAY
-          );
+          await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
         } else {
           const currentSequence = userData.currentSequence;
           const currentAttempts = userData.currentAttempts ?? 0;
           const hasVoucher = userData.hasVoucher;
-
+          if (
+            latestMessage?.toLowerCase() ===
+            QUIZ_START_KEYWORD?.toLowerCase() &&
+            currentSequence === MIN_SEQUENCE && userData.hasVoucher
+          ) {
+            return await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
+          }
           if (
             currentSequence > MIN_SEQUENCE &&
             currentSequence <= MAX_SEQUENCE &&
@@ -94,15 +99,19 @@ class MessengerController {
               sequence: currentSequence,
             });
             if (!question) throw new Error("Question not found");
-            if(currentSequence === 3 || currentSequence === 6){
-              await sendWhatsAppMessage(phone, question?.voucher?.voucherText);
-            }
             if (latestMessage && question?.answer?.length) {
               const isCorrect = isAnswerCloseEnough(
                 latestMessage,
                 question.answer
               );
               if (isCorrect) {
+                if (currentSequence === 3 || currentSequence === 6) {
+                  await sendWhatsAppMessage(
+                    phone,
+                    `🎁 You've unlocked a voucher! 
+                    🪙 Voucher: ${question?.voucher?.voucherText}`
+                  );
+                }
                 const nextSequence = currentSequence + 1;
                 if (nextSequence < TOTAL_SEQUENCE) {
                   const nextQuestion = await this.questionRepository.get({
@@ -112,7 +121,11 @@ class MessengerController {
                     currentSequence: nextSequence,
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
-                  await sendWhatsAppMessage(phone, `${nextQuestion?.clue}`);
+                  const prefixText = currentSequence === DEFAULT_SEQUENCE ? '👉 Question': '👉 Next question'
+                  await sendWhatsAppMessage(
+                    phone,
+                    `${prefixText}: ${nextQuestion?.clue}`
+                  );
                 } else {
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
@@ -133,6 +146,7 @@ class MessengerController {
                 await sendWhatsAppMessage(phone, hint);
               } else {
                 const nextSequence = currentSequence + 1;
+
                 if (nextSequence < TOTAL_SEQUENCE) {
                   const nextQuestion = await this.questionRepository.get({
                     sequence: nextSequence,
@@ -141,9 +155,24 @@ class MessengerController {
                     currentSequence: nextSequence,
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
-                  const correctAnswers = question?.answer?.length === 1 ? question?.answer[0]: question?.answer.join(",");
-                  await sendWhatsAppMessage(phone, `✅ Great job — that's the correct answer! 🎯🎉 : ${correctAnswers}`);
-                  await sendWhatsAppMessage(phone, `👉 Next question: Get ready for the next clue! 🧠🕵️‍♂️ : ${nextQuestion?.clue}`);
+                  const correctAnswers =
+                    question?.answer?.length === 1
+                      ? question?.answer[0]
+                      : question?.answer.join(",");
+                  await sendWhatsAppMessage(
+                    phone,
+                    `✅ Great job — that's the correct answer! 🎯🎉 : ${correctAnswers}`
+                  );
+                  if (currentSequence === 3 || currentSequence === 6) {
+                    await sendWhatsAppMessage(
+                      phone,
+                      `🎁 You've unlocked a voucher! 🪙 Voucher: ${question?.voucher?.voucherText}`
+                    );
+                  }
+                  await sendWhatsAppMessage(
+                    phone,
+                    `👉 Next question: ${nextQuestion?.clue}`
+                  );
                 } else {
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
@@ -159,10 +188,7 @@ class MessengerController {
               }
             }
           } else {
-            await sendWhatsAppMessage(
-              phone,
-              QUIZ_COMPLETED
-            );
+            await sendWhatsAppMessage(phone, QUIZ_COMPLETED);
           }
         }
       }

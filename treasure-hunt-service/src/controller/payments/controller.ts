@@ -147,7 +147,7 @@ class PaymentController {
             throw error;
           }
           await sendWhatsAppMessage(userResponse?.mobileNumber, WELCOME_MESSAGE);
-          await sendWhatsAppMessage(userResponse?.mobileNumber, question?.clue);
+          await sendWhatsAppMessage(userResponse?.mobileNumber, `${question?.clue}`);
           await this.userRepository.update(
             { mobileNumber },
             { currentSequence: question.sequence }
