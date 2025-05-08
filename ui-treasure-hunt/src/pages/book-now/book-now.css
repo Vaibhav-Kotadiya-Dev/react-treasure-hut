@@ -105,10 +105,37 @@
   cursor: not-allowed !important;
 }
 
+.PhoneInput {
+  width: 100%;
+  border: 1px solid #c4c4c4;
+  border-radius: 4px;
+  background-color: #ffffff;;
+  padding: 17.7px 14px;
+  font-size: 1rem;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  box-sizing: border-box;
+}
+
+.PhoneInput--error {
+  border-color: #d32f2f;
+}
+
+.PhoneInputInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  width: 100%;
+}
+
 @media (max-width: 600px) {
   .booking-main {
     background: white;
     padding: 40px 0;
+  }
+  .PhoneInput {
+    font-size: 0.9rem;
+    padding: 16.5px 12px;
   }
   .booking-wrapper {
     max-width: 100%;

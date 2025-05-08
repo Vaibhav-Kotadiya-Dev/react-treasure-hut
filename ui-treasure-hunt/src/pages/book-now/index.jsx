@@ -169,13 +169,13 @@ const BookingForm = () => {
                   international
                   defaultCountry="IN"
                   placeholder="Enter phone number"
-                  className=""
                   value={whatsapp}
                   onChange={(value) => {
                     setWhatsapp(value);
                     handleError("mobileNumber", value);
                   }}
                   onBlur={(e) => handleError("mobileNumber", e.target.value)}
+                  className={`PhoneInput ${errors["mobileNumber"] ? "PhoneInput--error" : ""}`}
                 />
                 {errors["mobileNumber"] && (
                   <div
