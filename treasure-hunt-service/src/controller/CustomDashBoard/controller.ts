@@ -105,11 +105,20 @@ class MessengerController {
                 question.answer
               );
               if (isCorrect) {
+                if(currentSequence !== DEFAULT_SEQUENCE){
+                  const correctAnswers =
+                    question?.answer?.length === 1
+                      ? question?.answer[0]
+                      : question?.answer.join(",");
+                  await sendWhatsAppMessage(
+                    phone,
+                    `✅ Great job — that's the correct answer! 🎯🎉 : ${correctAnswers}`
+                  );
+                }
                 if (currentSequence === 3 || currentSequence === 6) {
                   await sendWhatsAppMessage(
                     phone,
-                    `🎁 You've unlocked a voucher! 
-                    🪙 Voucher: ${question?.voucher?.voucherText}`
+                    `🎁 You've unlocked a voucher! 🪙 Voucher: ${question?.voucher?.voucherText}`
                   );
                 }
                 const nextSequence = currentSequence + 1;
