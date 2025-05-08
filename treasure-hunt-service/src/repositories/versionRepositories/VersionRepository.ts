@@ -26,8 +26,8 @@ export default class VersionRepository<D extends mongoose.Document, M extends mo
         return this.modelType.find(query, {}, options);
     }
 
-    async update(filters: any, dataToUpdate: any = {}) : Promise<D | null> {
-        return this.modelType.findOneAndUpdate({ ...filters }, dataToUpdate);
+    async update(match: any, dataToUpdate: any = {}, filters: object = {}) : Promise<D | null> {
+        return this.modelType.findOneAndUpdate({ ...match }, dataToUpdate, { ...filters });
     }
 
     async updateById(id: any, dataToUpdate: any = {}) : Promise<D | null> {

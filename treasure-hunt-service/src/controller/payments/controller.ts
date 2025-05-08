@@ -8,6 +8,7 @@ import IUserModel from "../../repositories/user/IUserModel";
 import { Permission, UserType, WELCOME_MESSAGE } from "../../utils/constant";
 import sendWhatsAppMessage from "../../libs/twilio-client";
 import QuestionRepository from "../../repositories/questions/QuestionRepositories";
+import { parsePhoneNumberWithError } from "libphonenumber-js";
 
 class PaymentController {
   private config: IConfig;
@@ -103,7 +104,7 @@ class PaymentController {
           fullName?: string
         };
         console.log(`:::METADATA::::${JSON.stringify(metadata)}`);
-        const mobileNumber = metadata?.mobileNumber;
+        const mobileNumber = parsePhoneNumberWithError(metadata?.mobileNumber || '')?.nationalNumber;
         const registrationDate = metadata?.registrationDate
           ? new Date(metadata.registrationDate)
           : new Date();
@@ -148,8 +149,8 @@ class PaymentController {
           }
           await sendWhatsAppMessage(userResponse?.mobileNumber, WELCOME_MESSAGE);
           await sendWhatsAppMessage(userResponse?.mobileNumber, `${question?.clue}`);
-          await this.userRepository.update(
-            { mobileNumber },
+          await this.userRepository.updateById(
+            userResponse._id,
             { currentSequence: question.sequence }
           );
         }

@@ -41,8 +41,11 @@ class MessengerController {
       const question = await this.questionRepository.get({ isStart: true });
       if (!question) return;
       await this.userRepository.update(
-        { mobileNumber: phone },
-        { currentSequence: question.sequence }
+        { mobileNumber: phone, },
+        { currentSequence: question.sequence },
+        {
+          sort: { createdAt: -1 }
+        }
       );
       const response = await sendWhatsAppMessage(phone, question?.clue);
       res.status(200).json(response);
@@ -83,12 +86,14 @@ class MessengerController {
           const currentSequence = userData.currentSequence;
           const currentAttempts = userData.currentAttempts ?? 0;
           const hasVoucher = userData.hasVoucher;
-          if (
-            latestMessage?.toLowerCase() ===
-            QUIZ_START_KEYWORD?.toLowerCase() &&
-            currentSequence === MIN_SEQUENCE && userData.hasVoucher
-          ) {
-            return await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
+          if (currentSequence === MIN_SEQUENCE && userData.hasVoucher) {
+            if (
+              latestMessage?.toLowerCase() === QUIZ_START_KEYWORD?.toLowerCase()
+            ) {
+              return await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
+            } else {
+              return ;
+            }
           }
           if (
             currentSequence > MIN_SEQUENCE &&

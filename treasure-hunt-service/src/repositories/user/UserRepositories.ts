@@ -23,8 +23,8 @@ export default class UserRepository extends VersionRepository<IUserModel, mongoo
     return super.list(query, options);
   }
 
-  async update(filter: object, dataToUpdate: any = {}) {
-    return super.update(filter, dataToUpdate);
+  async update(match: object, dataToUpdate: any = {}, filter: object = {}) {
+    return super.update(match, dataToUpdate, filter);
   }
 
   async updateById(id: any, dataToUpdate: any = {}) : Promise<IUserModel | null> {
