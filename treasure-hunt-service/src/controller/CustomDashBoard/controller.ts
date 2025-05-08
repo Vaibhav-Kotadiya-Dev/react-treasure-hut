@@ -106,13 +106,9 @@ class MessengerController {
               );
               if (isCorrect) {
                 if(currentSequence !== DEFAULT_SEQUENCE){
-                  const correctAnswers =
-                    question?.answer?.length === 1
-                      ? question?.answer[0]
-                      : question?.answer.join(",");
                   await sendWhatsAppMessage(
                     phone,
-                    `✅ Great job — that's the correct answer! 🎯🎉 : ${correctAnswers}`
+                    `✅ Great job — that's the correct answer! 🎯🎉`
                   );
                 }
                 if (currentSequence === 3 || currentSequence === 6) {
