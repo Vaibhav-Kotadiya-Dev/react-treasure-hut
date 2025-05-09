@@ -167,7 +167,7 @@ const BookingForm = () => {
                 <Typography className="form-label">Mobile Number</Typography>
                 <PhoneInput
                   international
-                  defaultCountry="IN"
+                  defaultCountry="GB"
                   placeholder="Enter phone number"
                   value={whatsapp}
                   onChange={(value) => {
