@@ -11,6 +11,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createStripeCheckoutSession } from "../../api/payment";
 import { useToast } from "../../components/toaster";
 import "react-phone-number-input/style.css";
+import Loader from "../../components/loader";
 
 const BookingForm = () => {
   const [participants, setParticipants] = useState(2);
@@ -18,6 +19,7 @@ const BookingForm = () => {
   const [fullName, setFullName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [errors, setErrors] = useState({});
+  const [loader, setLoader] = useState(false);
   const { showToast } = useToast();
 
   const pricePerPerson = 10;
@@ -26,7 +28,7 @@ const BookingForm = () => {
 
   const handleError = (key, value) => {
     let message = "";
-    const fullNameRegex = /^[A-Za-z\s'-]{2,50}$/;
+    // const fullNameRegex = /^[A-Za-z\s'-]{2,50}$/;
     if (!value || (typeof value === "string" && value?.trim() === "")) {
       const errorKeysName = {
         participants: "Number of participants",
@@ -40,7 +42,7 @@ const BookingForm = () => {
       message = "Minimum 2 participants are required";
     } else if (
       key === "fullName" &&
-      (typeof value !== "string" || !fullNameRegex.test(value))
+      (typeof value !== "string")
     ) {
       message = "Enter a valid name.";
     }
@@ -49,7 +51,6 @@ const BookingForm = () => {
       [key]: message,
     }));
   };
-
   const isFormValid = () => {
     return (
       Number(participants) > 1 &&
@@ -63,9 +64,10 @@ const BookingForm = () => {
   const handleOnClick = async (e) => {
     e.preventDefault();
     try {
+      setLoader(true);
       const checkoutSessionResponse = await createStripeCheckoutSession({
         mobileNumber: whatsapp,
-        registrationDate,
+        registrationDate: registrationDate?.format('YYYY-MM-DD'),
         teamMemberCount: participants,
         amount: total,
         fullName,
@@ -82,6 +84,8 @@ const BookingForm = () => {
           "User cannot re-registor without completed previous quiz",
           "error"
         );
+    } finally {
+      setLoader(false);
     }
   };
   return (
@@ -240,7 +244,7 @@ const BookingForm = () => {
                 disabled={!isFormValid()}
                 onClick={handleOnClick}
               >
-                PAY NOW
+                {loader ? <Loader color={'success'}/> : 'PAY NOW'}
               </Button>
             </Box>
           </Box>

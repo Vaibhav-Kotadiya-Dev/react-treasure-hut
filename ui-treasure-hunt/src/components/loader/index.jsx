@@ -11,7 +11,7 @@ const Loader = ({ variant = 'normal', text = '' }) => {
         top: isOverlay ? 0 : 'auto',
         left: isOverlay ? 0 : 'auto',
         width: isOverlay ? '100%' : 'auto',
-        height: isOverlay ? '100%' : '60vh',
+        height: isOverlay ? '100%' : '23px',
         backgroundColor: isOverlay ? 'rgba(0,0,0,0.4)' : 'transparent',
         display: 'flex',
         alignItems: 'center',
