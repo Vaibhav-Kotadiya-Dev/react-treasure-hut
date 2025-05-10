@@ -9,6 +9,7 @@ interface IConfig {
     JWT_SECRET: string;
     JWT_EXPIRE: string;
     SALT_ROUND: string;
+    FE_URL: string;
 }
 
 export default IConfig;

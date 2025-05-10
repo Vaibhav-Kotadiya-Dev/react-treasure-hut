@@ -13,7 +13,8 @@ const configuration : IConfig = {
     WEB_HOOK_SECRET: process.env.WEB_HOOK_SECRET || '',
     JWT_SECRET: process.env.JWT_SECRET || '',
     JWT_EXPIRE: process.env.JWT_EXPIRE || '',
-    SALT_ROUND: process.env.SALT_ROUND || ''
+    SALT_ROUND: process.env.SALT_ROUND || '',
+    FE_URL: process.env.FE_URL || ''
 };
 
 export default Object.freeze(configuration);

@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 
-const fullNameRegex = /^[A-Za-z\s'-]{2,50}$/;
+// const fullNameRegex = /^[A-Za-z\s'-]{2,50}$/;
 export const createBookingSchema = yup.object().shape({
   mobileNumber: yup
     .string()
@@ -21,6 +21,6 @@ export const createBookingSchema = yup.object().shape({
     .required('Number of participants is required')
     .min(2, 'Minimum 2 participants are required'),
   amount: yup.number().required('Amount is required').min(1, 'Amount cannot be negative or zero'),
-  fullName: yup.string().matches(fullNameRegex, 'Enter a valid name').required('Full name is required')
+  fullName: yup.string().required('Full name is required')
 });
 

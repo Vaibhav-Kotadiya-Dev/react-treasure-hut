@@ -39,7 +39,8 @@ class PaymentController {
         error.statusCode = 400;
         throw error;
       };
-      const userPresented = await this.userRepository.get({ mobileNumber }, {}, { sort: { createdAt: -1 }});
+      const refinedMobileNumber = parsePhoneNumberWithError(mobileNumber || '')?.nationalNumber;
+      const userPresented = await this.userRepository.get({ mobileNumber: refinedMobileNumber }, {}, { sort: { createdAt: -1 }});
       if(userPresented && !userPresented.hasVoucher){
         const { createdAt: lastRegistrationDate } = userPresented;
         const lastDate = new Date(lastRegistrationDate);
@@ -50,7 +51,8 @@ class PaymentController {
            error.statusCode = 409;
            throw error;
         }
-      }const amountInPaiseOrCents = Math.round(parseFloat(amount) * 100);
+      }
+      const amountInPaiseOrCents = Math.round(parseFloat(amount) * 100);
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ["card"], // provide all payments methods
         mode: "payment",
@@ -64,7 +66,8 @@ class PaymentController {
             quantity: 1,
           },
         ],
-        success_url: "http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}", // change url for production
+        success_url: `${this.config.FE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${this.config.FE_URL}/failed`,
         metadata: {
           mobileNumber,
           registrationDate,

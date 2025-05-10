@@ -41,7 +41,7 @@ class MessengerController {
       const question = await this.questionRepository.get({ isStart: true });
       if (!question) return;
       await this.userRepository.update(
-        { mobileNumber: phone, },
+        { mobileNumber: phone },
         { currentSequence: question.sequence },
         {
           sort: { createdAt: -1 }
