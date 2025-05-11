@@ -33,30 +33,60 @@ class PaymentController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const { amount = 100, registrationDate, mobileNumber, teamMemberCount, fullName } = req.body;
+      const {
+        amount = 100,
+        registrationDate,
+        mobileNumber,
+        teamMemberCount,
+        fullName,
+      } = req.body;
       if (!amount || !mobileNumber) {
         const error = new Error("Missing required fields") as any;
         error.statusCode = 400;
         throw error;
-      };
-      const refinedMobileNumber = parsePhoneNumberWithError(mobileNumber || '')?.nationalNumber;
-      const userPresented = await this.userRepository.get({ mobileNumber: refinedMobileNumber }, {}, { sort: { createdAt: -1 }});
-      if (userPresented && !userPresented.hasVoucher) {
-        const regDate = new Date(registrationDate);
+      }
+      const refinedMobileNumber = parsePhoneNumberWithError(
+        mobileNumber || ""
+      )?.nationalNumber;
+      const userPresented = await this.userRepository.list(
+        { mobileNumber: refinedMobileNumber, hasVoucher: false },
+        {},
+        { sort: { createdAt: -1 } }
+      );
+      if (userPresented && userPresented?.length) {
+        const requestedDate = new Date(registrationDate);
+        const requestedDateUTC = new Date(
+          Date.UTC(
+            requestedDate.getUTCFullYear(),
+            requestedDate.getUTCMonth(),
+            requestedDate.getUTCDate()
+          )
+        );
         const now = new Date();
-        const regDateOnly = new Date(Date.UTC(
-          regDate.getUTCFullYear(),
-          regDate.getUTCMonth(),
-          regDate.getUTCDate()
-        ));
-        const todayUTC = new Date(Date.UTC(
-          now.getUTCFullYear(),
-          now.getUTCMonth(),
-          now.getUTCDate()
-        ));
-        if (regDateOnly.getTime() === todayUTC.getTime()) {
+        const todayUTC = new Date(
+          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+        );
+        if (requestedDateUTC.getTime() === todayUTC.getTime()) {
           const error = new Error(
-            "User cannot re-register within 24 hours or must complete previous quiz"
+            "User cannot re-register without completing the previous quiz."
+          ) as any;
+          error.statusCode = 409;
+          throw error;
+        }
+        const duplicateBooking = userPresented.some((user: any) => {
+          const regDate = new Date(user?.registrationDate);
+          const regDateOnly = new Date(
+            Date.UTC(
+              regDate.getUTCFullYear(),
+              regDate.getUTCMonth(),
+              regDate.getUTCDate()
+            )
+          );
+          return regDateOnly.getTime() === requestedDateUTC.getTime();
+        });
+        if (duplicateBooking) {
+          const error = new Error(
+            "You already have a booking for this date. Please complete the existing quiz or choose another date."
           ) as any;
           error.statusCode = 409;
           throw error;
@@ -82,7 +112,7 @@ class PaymentController {
           mobileNumber,
           registrationDate,
           teamMemberCount,
-          fullName
+          fullName,
         },
       });
       const checkoutUrl = session.url;
@@ -106,6 +136,7 @@ class PaymentController {
         this.config.WEB_HOOK_SECRET!
       );
       const session = event.data.object as Stripe.Checkout.Session;
+      console.log(event.type, session.payment_status);
       if (
         event.type === "checkout.session.completed" &&
         session.payment_status === "paid"
@@ -114,12 +145,14 @@ class PaymentController {
           mobileNumber?: string;
           registrationDate?: string;
           teamMemberCount?: string;
-          fullName?: string
+          fullName?: string;
         };
         console.log(`:::METADATA::::${JSON.stringify(metadata)}`);
-        const mobileNumber = parsePhoneNumberWithError(metadata?.mobileNumber || '')?.nationalNumber;
+        const mobileNumber = parsePhoneNumberWithError(
+          metadata?.mobileNumber || ""
+        )?.nationalNumber;
         const registrationDate = metadata?.registrationDate
-          ? new Date(metadata.registrationDate)
+          ? metadata.registrationDate
           : new Date();
         const teamMemberCount = metadata?.teamMemberCount
           ? parseInt(metadata.teamMemberCount, 10)
@@ -133,15 +166,21 @@ class PaymentController {
           status: session.status,
         });
         if (payment._id) {
-          const regDate: Date = new Date(registrationDate);
-          regDate.setHours(0, 0, 0, 0);
+          const regDate = new Date(registrationDate);
+          const regDateOnly = new Date(
+            Date.UTC(
+              regDate.getUTCFullYear(),
+              regDate.getUTCMonth(),
+              regDate.getUTCDate()
+            )
+          );
           const userResponse: IUserModel = await this.userRepository.create({
             mobileNumber,
             paymentId: payment._id,
             isPaymentSuccessful: true,
             isPaymentPending: false,
             isPaymentError: false,
-            registrationDate: regDate.toISOString(),
+            registrationDate: regDateOnly?.toISOString(),
             teamMemberCount,
             fullName,
             userType: UserType.USER,
@@ -160,12 +199,17 @@ class PaymentController {
             error.statusCode = 404;
             throw error;
           }
-          await sendWhatsAppMessage(userResponse?.mobileNumber, WELCOME_MESSAGE);
-          await sendWhatsAppMessage(userResponse?.mobileNumber, `${question?.clue}`);
-          await this.userRepository.updateById(
-            userResponse._id,
-            { currentSequence: question.sequence }
+          await sendWhatsAppMessage(
+            userResponse?.mobileNumber,
+            WELCOME_MESSAGE
           );
+          await sendWhatsAppMessage(
+            userResponse?.mobileNumber,
+            `${question?.clue}`
+          );
+          await this.userRepository.updateById(userResponse._id, {
+            currentSequence: question.sequence,
+          });
         }
         return res.status(200).json({ success: true, payment });
       } else {
@@ -173,7 +217,6 @@ class PaymentController {
         error.statusCode = 400;
         throw error;
       }
-      
     } catch (err: any) {
       console.error("Webhook signature verification failed:", err.message);
       return next(err);
@@ -187,9 +230,8 @@ class PaymentController {
         error.statusCode = 400;
         throw error;
       }
-      const session: Stripe.Response<Stripe.Checkout.Session> = await this.stripe.checkout.sessions.retrieve(
-        sessionId.toString()
-      );
+      const session: Stripe.Response<Stripe.Checkout.Session> =
+        await this.stripe.checkout.sessions.retrieve(sessionId.toString());
       if (session.payment_status === "paid") {
         return res.json({ valid: true, session });
       } else {
@@ -198,7 +240,7 @@ class PaymentController {
     } catch (err) {
       return next(err);
     }
-  }
+  };
 }
 
 export default PaymentController.getInstance();

@@ -22,8 +22,8 @@ export default class VersionRepository<D extends mongoose.Document, M extends mo
         return this.modelType.insertMany(bulkInsert);
     }
 
-    async list(query: any = {}, options: any = {}) : Promise<D[] | any> {
-        return this.modelType.find(query, {}, options);
+    async list(query: any = {}, projection: any = {}, options: any = {}) : Promise<D[] | any> {
+        return this.modelType.find(query, projection, options);
     }
 
     async update(match: any, dataToUpdate: any = {}, filters: object = {}) : Promise<D | null> {

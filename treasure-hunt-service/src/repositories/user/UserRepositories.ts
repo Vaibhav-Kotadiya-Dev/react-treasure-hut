@@ -17,10 +17,10 @@ export default class UserRepository extends VersionRepository<IUserModel, mongoo
     return super.create({...options, userId });
   }
 
-  async list(query: any = {}, options: any = {}) {
+  async list(query: any = {}, projection: any = {}, options: any = {}) {
     options.skip = Number(options.skip);
     options.limit = Number(options.limit);
-    return super.list(query, options);
+    return super.list(query, projection, options);
   }
 
   async update(match: object, dataToUpdate: any = {}, filter: object = {}) {
