@@ -81,7 +81,7 @@ const BookingForm = () => {
     } catch (error) {
       if (error.status === 409)
         showToast(
-          "User cannot re-registor without completed previous quiz",
+          error?.response?.data?.message,
           "error"
         );
     } finally {
