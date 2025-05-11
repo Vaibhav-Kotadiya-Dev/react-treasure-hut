@@ -33,14 +33,22 @@ const PaymentSuccess = () => {
 
   if (isValid === null) {
     return (
-      <Box className="payment-container" sx={{ textAlign: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+          flexDirection: "column",
+        }}
+      >
         <CircularProgress />
         <Typography mt={2}>Verifying payment...</Typography>
       </Box>
     );
   }
   // // eslint-disable-next-line eqeqeq
-  if (isValid == false) {
+  if (isValid === false) {
     return (
       <Box className="success-main">
       <Box className="payment-container" sx={{ textAlign: "center" }}>

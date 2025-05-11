@@ -1,7 +1,7 @@
 import React from 'react';
 import { CircularProgress, Box, Typography } from '@mui/material';
 
-const Loader = ({ variant = 'normal', text = '' }) => {
+const Loader = ({ variant = 'normal', text = '', color = 'primary', size = 40 }) => {
   const isOverlay = variant === 'overlay';
 
   return (
@@ -20,7 +20,7 @@ const Loader = ({ variant = 'normal', text = '' }) => {
         zIndex: isOverlay ? 9999 : 'auto',
       }}
     >
-      <CircularProgress size={isOverlay ? 70 : 40} thickness={isOverlay ? 5 : 4} />
+      <CircularProgress color={color} size={isOverlay ? 70 : size} thickness={isOverlay ? 5 : 4} />
       {text && (
         <Typography mt={2} color={isOverlay ? '#fff' : '#000'}>
           {text}
