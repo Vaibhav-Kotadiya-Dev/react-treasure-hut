@@ -41,15 +41,25 @@ class PaymentController {
       };
       const refinedMobileNumber = parsePhoneNumberWithError(mobileNumber || '')?.nationalNumber;
       const userPresented = await this.userRepository.get({ mobileNumber: refinedMobileNumber }, {}, { sort: { createdAt: -1 }});
-      if(userPresented && !userPresented.hasVoucher){
-        const { createdAt: lastRegistrationDate } = userPresented;
-        const lastDate = new Date(lastRegistrationDate);
+      if (userPresented && !userPresented.hasVoucher) {
+        const regDate = new Date(registrationDate);
         const now = new Date();
-        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        if(lastDate > oneDayAgo){
-           const error = new Error('User can not re-registor in 24 hours or complete your previous quiz') as any;
-           error.statusCode = 409;
-           throw error;
+        const regDateOnly = new Date(Date.UTC(
+          regDate.getUTCFullYear(),
+          regDate.getUTCMonth(),
+          regDate.getUTCDate()
+        ));
+        const todayUTC = new Date(Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate()
+        ));
+        if (regDateOnly.getTime() === todayUTC.getTime()) {
+          const error = new Error(
+            "User cannot re-register within 24 hours or must complete previous quiz"
+          ) as any;
+          error.statusCode = 409;
+          throw error;
         }
       }
       const amountInPaiseOrCents = Math.round(parseFloat(amount) * 100);
