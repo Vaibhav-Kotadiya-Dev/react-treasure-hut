@@ -62,17 +62,6 @@ class PaymentController {
             requestedDate.getUTCDate()
           )
         );
-        const now = new Date();
-        const todayUTC = new Date(
-          Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-        );
-        if (requestedDateUTC.getTime() === todayUTC.getTime()) {
-          const error = new Error(
-            "User cannot re-register without completing the previous quiz."
-          ) as any;
-          error.statusCode = 409;
-          throw error;
-        }
         const duplicateBooking = userPresented.some((user: any) => {
           const regDate = new Date(user?.registrationDate);
           const regDateOnly = new Date(
