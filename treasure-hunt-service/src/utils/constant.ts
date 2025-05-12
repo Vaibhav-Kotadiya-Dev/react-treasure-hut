@@ -25,4 +25,11 @@ export const WELCOME_MESSAGE = `🎉 Welcome to the Ultimate Treasure Hunt! 🗺
 Solve clues, unlock secrets, and race your way to victory. 🧩🏁
 Good luck, adventurer — your journey begins now! 🚀🪙`;
 
+export const FUTURE_ONBOARD_WELCOME_MESSAGE = (registrationDate: any) => (`🎉 Welcome to the Ultimate Treasure Hunt! 🗺️
+Solve clues, unlock secrets, and race your way to victory. 🧩🏁
+Good luck, adventurer — your journey begins now! 🚀🪙
+
+🕒 Registration opens on ${registrationDate}.  
+⌨️ You'll need to type 'start' on this day to begin your quiz — be ready!`);
+
 export const QUIZ_START_KEYWORD = 'start';

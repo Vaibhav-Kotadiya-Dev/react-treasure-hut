@@ -14,6 +14,7 @@ import {
   QUIZ_COMPLETED,
   QUIZ_START_KEYWORD,
   TOTAL_SEQUENCE,
+  WELCOME_MESSAGE,
 } from "../../utils/constant";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 
@@ -69,30 +70,61 @@ class MessengerController {
           From?.split(":")[1]
         ).nationalNumber;
         console.log(`${phone} -> ${latestMessage}`);
-        const userData = await this.userRepository.get(
-          {
-            mobileNumber: phone,
-            isPaymentSuccessful: { $eq: true },
-            userType: { $eq: "user" },
-          },
-          {},
-          { sort: { createdAt: -1 } }
-        );
-        if (!userData) throw new Error("User not found");
-        const now = new Date();
-        if (now < new Date(userData.registrationDate)) {
-          await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
+        const todaysDate = new Date();
+        const todayDateIsoString = new Date(
+          Date.UTC(
+            todaysDate.getUTCFullYear(),
+            todaysDate.getUTCMonth(),
+            todaysDate.getUTCDate()
+          )
+        ).toISOString();
+  //       const dateFor14th = new Date(todaysDate.getFullYear(), todaysDate.getMonth(), 14);
+  //       const testDateOnIsoString = new Date(
+  //         Date.UTC(
+  //           dateFor14th.getFullYear(),
+  // dateFor14th.getMonth(),
+  // dateFor14th.getDate()
+  //         )
+  //       ).toISOString();
+        const userData = await this.userRepository.get({
+          mobileNumber: phone,
+          isPaymentSuccessful: { $eq: true },
+          userType: { $eq: "user" },
+          registrationDate: { $eq: todayDateIsoString },
+        });
+        console.log(userData, todayDateIsoString)
+        if (!userData) {
+          return await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
         } else {
-          const currentSequence = userData.currentSequence;
+          let currentSequence = userData.currentSequence;
           const currentAttempts = userData.currentAttempts ?? 0;
           const hasVoucher = userData.hasVoucher;
+          if (
+            latestMessage?.toLowerCase() ===
+              QUIZ_START_KEYWORD?.toLowerCase() &&
+            currentSequence === MIN_SEQUENCE &&
+            !userData.hasVoucher
+          ) {
+            const question: any = await this.questionRepository.get({
+              isStart: true,
+            });
+            if (!question) {
+              const error = new Error("No Question found") as any;
+              error.statusCode = 404;
+              throw error;
+            }
+            await this.userRepository.updateById(userData._id, {
+              currentSequence: question.sequence,
+            });
+            currentSequence = question.sequence;
+          }
           if (currentSequence === MIN_SEQUENCE && userData.hasVoucher) {
             if (
               latestMessage?.toLowerCase() === QUIZ_START_KEYWORD?.toLowerCase()
             ) {
               return await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
             } else {
-              return ;
+              return;
             }
           }
           if (
@@ -110,7 +142,7 @@ class MessengerController {
                 question.answer
               );
               if (isCorrect) {
-                if(currentSequence !== DEFAULT_SEQUENCE){
+                if (currentSequence !== DEFAULT_SEQUENCE) {
                   await sendWhatsAppMessage(
                     phone,
                     `✅ Great job — that's the correct answer! 🎯🎉`
@@ -131,7 +163,10 @@ class MessengerController {
                     currentSequence: nextSequence,
                     currentAttempts: DEFAULT_ATTEMPT,
                   });
-                  const prefixText = currentSequence === DEFAULT_SEQUENCE ? '👉 Question': '👉 Next question'
+                  const prefixText =
+                    currentSequence === DEFAULT_SEQUENCE
+                      ? "👉 Question"
+                      : "👉 Next question";
                   await sendWhatsAppMessage(
                     phone,
                     `${prefixText}: ${nextQuestion?.clue}`

@@ -47,15 +47,20 @@ const createMultipleAdmins = async () => {
         console.error('Mobile number and password are required. Skipping...');
         continue;
       }
-      const existingAdmin = await userRepository.get({ mobileNumber });
+      const existingAdmin = await userRepository.get({ mobileNumber, userType: 'admin' });
       if (existingAdmin) {
         console.log('Admin already exists with mobileNumber:', existingAdmin.mobileNumber);
         continue; 
       }
       const hashedPassword = await bcrypt.hash(plainPassword, Number(process.env.SALT_ROUND)!);
-      let registrationDate: Date = new Date();
-      registrationDate.setHours(0, 0, 0, 0);
-      const updatedRegistrationDate = registrationDate.toISOString();
+      let registrationDate = new Date();
+      const updatedRegistrationDate = new Date(
+        Date.UTC(
+          registrationDate.getUTCFullYear(),
+          registrationDate.getUTCMonth(),
+          registrationDate.getUTCDate()
+        )
+      );
       await userRepository.create({
         mobileNumber,
         hashedPassword,

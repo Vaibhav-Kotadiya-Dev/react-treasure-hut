@@ -14,8 +14,8 @@ export default class VersionRepository<D extends mongoose.Document, M extends mo
         });
     }
 
-    async countDocuments(): Promise<number> {
-       return this.modelType.countDocuments();
+    async countDocuments(filter: object = {}, options: object = {}): Promise<number> {
+       return this.modelType.countDocuments(filter, options);
     }
 
     async insertMany(bulkInsert: any[] = []) : Promise<D[]> {

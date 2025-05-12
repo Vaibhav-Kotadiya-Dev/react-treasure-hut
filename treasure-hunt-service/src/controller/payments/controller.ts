@@ -5,10 +5,11 @@ import config from '../../config/configuration';
 import PaymentRepository from '../../repositories/payments/PaymentRepositories';
 import UserRepository from "../../repositories/user/UserRepositories";
 import IUserModel from "../../repositories/user/IUserModel";
-import { Permission, UserType, WELCOME_MESSAGE } from "../../utils/constant";
+import { FUTURE_ONBOARD_WELCOME_MESSAGE, Permission, UserType, WELCOME_MESSAGE } from "../../utils/constant";
 import sendWhatsAppMessage from "../../libs/twilio-client";
 import QuestionRepository from "../../repositories/questions/QuestionRepositories";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
+import dayjs from "dayjs";
 
 class PaymentController {
   private config: IConfig;
@@ -180,25 +181,40 @@ class PaymentController {
             error.statusCode = 500;
             throw error;
           }
-          const question: any = await this.questionRepository.get({
-            isStart: true,
-          });
-          if (!question) {
-            const error = new Error("No Question found") as any;
-            error.statusCode = 404;
-            throw error;
+          const todaysDate = new Date();
+          const todayDateOnIsoString = new Date(
+          Date.UTC(
+            todaysDate.getUTCFullYear(),
+            todaysDate.getUTCMonth(),
+            todaysDate.getUTCDate()
+          )
+        ).toISOString();
+          if(todayDateOnIsoString === regDateOnly?.toISOString()) {
+            const question: any = await this.questionRepository.get({
+              isStart: true,
+            });
+            if (!question) {
+              const error = new Error("No Question found") as any;
+              error.statusCode = 404;
+              throw error;
+            }
+            await sendWhatsAppMessage(
+              userResponse?.mobileNumber,
+              WELCOME_MESSAGE
+            );
+            await sendWhatsAppMessage(
+              userResponse?.mobileNumber,
+              `${question?.clue}`
+            );
+            await this.userRepository.updateById(userResponse._id, {
+              currentSequence: question.sequence,
+            });
+          } else {
+            await sendWhatsAppMessage(
+              userResponse?.mobileNumber,
+              FUTURE_ONBOARD_WELCOME_MESSAGE(dayjs(userResponse?.registrationDate).format("dddd, MMMM D, YYYY"))
+            );
           }
-          await sendWhatsAppMessage(
-            userResponse?.mobileNumber,
-            WELCOME_MESSAGE
-          );
-          await sendWhatsAppMessage(
-            userResponse?.mobileNumber,
-            `${question?.clue}`
-          );
-          await this.userRepository.updateById(userResponse._id, {
-            currentSequence: question.sequence,
-          });
         }
         return res.status(200).json({ success: true, payment });
       } else {

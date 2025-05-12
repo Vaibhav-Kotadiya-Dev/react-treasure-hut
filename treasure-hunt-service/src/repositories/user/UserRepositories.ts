@@ -11,7 +11,10 @@ export default class UserRepository extends VersionRepository<IUserModel, mongoo
   static generateObjectId() {
     return String(new mongoose.Types.ObjectId());
   }
-
+  
+  async countDocuments(filter: object = {}, options: object = {}) {
+     return super.countDocuments(filter, options);
+  }
   async create(options: object) {
     const userId = UserRepository.generateObjectId();
     return super.create({...options, userId });

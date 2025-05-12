@@ -73,7 +73,7 @@ class UserController {
   adminLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const { mobileNumber, password } = req.body;
-      const user = await this.userRepository.get({ mobileNumber });
+      const user = await this.userRepository.get({ mobileNumber,  userType: 'admin' });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -108,40 +108,82 @@ class UserController {
 
   adminLogout = async (req: Request, res: Response, next: NextFunction) => {
      try {
-      const token = req?.headers?.authorization?.split(' ')[1];
-
-      res.clearCookie("refreshToken");
+      const refreshToken = req.cookies.refreshToken;
+      const token = req?.headers?.authorization?.split(" ")[1];
+      if (!refreshToken) {
+        const error = new Error("No refresh token found") as any;
+        error.statusCode = 401;
+        throw error;
+      }
+      const decodeAccessToken = jwt.verify(token!, this.config.JWT_SECRET!) as any;
+      const userId = decodeAccessToken?.id;
+      const user = await this.userRepository.get({ _id: userId });
+      if (!user) {
+        const error = new Error("User not found") as any;
+        error.statusCode = 404;
+        throw error;
+      }
+      if(user?.refreshToken !== refreshToken){
+         const error = new Error("No refresh token found") as any;
+         error.statusCode = 400;
+         throw error;
+      }
+      await this.userRepository.updateById(userId, {
+        $unset: { refreshToken: "" }
+      });
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      return res.status(200).json({ success: true, message: "Logged out successfully" });
      } catch (error){
         next(error);
      }
-      
   };
 
   list = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-      const listOfUser: IUserModel[] = await this.userRepository.list({
-        isPaymentSuccessful: { $eq: true }, // only for debug for prod it should be changed
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const skip = (page - 1) * limit;
+      const filter = { isPaymentSuccessful: { $eq: true } };
+      const [users, totalCount] = await Promise.all([
+        this.userRepository.list(filter, {}, { skip, limit }),
+        this.userRepository.countDocuments(filter)
+      ]);
+      return res.status(200).json({
+        total: totalCount,
+        page,
+        limit,
+        users,
       });
-      if (!listOfUser) {
-        throw new Error("No User found");
-      }
-      return res.status(200).json(listOfUser);
     } catch (error) {
-      console.log(error);
-      return res.sendStatus(500);
+      console.error(error);
+      return next(error);
     }
   };
+  
 
   refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
-        return res.status(401).json({ message: 'No refresh token found' });
+        const error = new Error("No refresh token found") as any;
+        error.statusCode = 401;
+        throw error;
       }
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as any;
       const user = await this.userRepository.get({ _id: decoded.id });
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        const error = new Error("User not found") as any;
+        error.statusCode = 404;
+        throw error;
+      }
+      if(user?.refreshToken !== refreshToken){
+         const error = new Error("No refresh token found") as any;
+         error.statusCode = 400;
+         throw error;
       }
       const newAccessToken = generateAccessToken(user);
       return res.status(200).json({ accessToken: newAccessToken });
@@ -152,7 +194,7 @@ class UserController {
           .status(401)
           .json({ message: "Refresh token expired, please login again" });
       }
-      return res.status(401).json({ message: "Invalid refresh token" });
+      next(error);
     }
   };
 
