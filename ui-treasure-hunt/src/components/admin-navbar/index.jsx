@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   AppBar,
@@ -18,62 +19,48 @@ import HomeIcon from "@mui/icons-material/Home";
 import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import { useNavigate } from "react-router-dom";
 import "./navbar.css";
+import { adminLogout } from "../../api/user";
+import AccountMenu from "../Account-menu";
 
 const AdminNavbar = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
-  const toggleDrawer = (open) => () => {
-    setDrawerOpen(open);
+  const toggleDrawer = (side, open) => () => {
+    if (side === "left") setLeftDrawerOpen(open);
   };
 
   const handleNavigation = (path) => {
     navigate(path);
-    setDrawerOpen(false);
+    setLeftDrawerOpen(false);
+  };
+
+  const handleLogout = () => {
+    // Add logout logic
+    adminLogout()
+      .then(() => {
+        localStorage.clear();
+        navigate("/admin/login");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+   
   };
 
   return (
     <>
-      <AppBar position="static" className="custom-navbar">
-        <Toolbar className="navbar-toolbar">
-          <IconButton
-            edge="start"
-            className="menu-button"
-            onClick={toggleDrawer(true)}
-          >
+      <AppBar position="static" className="custom-navbar-admin">
+        <Toolbar className="navbar-toolbar" style={{ justifyContent: "space-between" }}>
+          <IconButton onClick={toggleDrawer("left", true)}>
             <MenuIcon sx={{ color: "black", fontWeight: 900, fontSize: 35 }} />
           </IconButton>
-
-          <Typography
-            variant="h6"
-            onClick={() => navigate("/book-now")}
-            sx={{
-              cursor: "pointer",
-              fontWeight: 600,
-              display: "inline-block",
-              position: "relative",
-              paddingBottom: "4px",
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                width: "0%",
-                height: "2px",
-                bottom: 0,
-                left: 0,
-                backgroundColor: "white",
-                transition: "width 0.3s ease",
-              },
-              "&:hover::after": {
-                width: "100%",
-              },
-            }}
-          >
-            Logout
-          </Typography>
+          <AccountMenu onLogout={handleLogout} />
         </Toolbar>
       </AppBar>
 
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
+      {/* Left Drawer */}
+      <Drawer anchor="left" open={leftDrawerOpen} onClose={toggleDrawer("left", false)}>
         <List className="drawer-list">
           <Box
             sx={{
@@ -85,54 +72,30 @@ const AdminNavbar = () => {
               justifyContent: "space-between",
             }}
           >
-            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'black', alignContent: 'center' }}>
               Admin Panel
             </Typography>
-            <IconButton
-              edge="start"
-              className="menu-button"
-              onClick={toggleDrawer(false)}
-            >
-              <MenuCloseIcon
-                sx={{
-                  color: "white",
-                  fontWeight: 900,
-                  fontSize: 35,
-                  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                  transform: "rotate(0deg)",
-                  "&:hover": {
-                    color: "#FEF3E2",
-                    cursor: "pointer",
-                    transform: "rotate(90deg)",
-                    scale: "1.1",
-                  },
-                  "&:active": {
-                    transform: "rotate(90deg) scale(0.95)",
-                    transition: "transform 0.1s ease",
-                  },
-                }}
-              />
+            <IconButton onClick={toggleDrawer("left", false)}>
+              <MenuCloseIcon sx={{ color: "white", fontSize: 30 }} />
             </IconButton>
           </Box>
           <Divider />
-          <ListItem button onClick={() => handleNavigation("/")}>
+          <ListItem button onClick={() => handleNavigation("/admin/users")}>
             <ListItemIcon>
               <HomeIcon sx={{ color: "black" }} />
             </ListItemIcon>
             <ListItemText primary="Booking List" />
           </ListItem>
           <Divider />
-          <ListItem button onClick={() => handleNavigation("/book-now")}>
+          <ListItem button onClick={() => handleNavigation("/admin/date-config")}>
             <ListItemIcon>
               <BookOnlineIcon sx={{ color: "black" }} />
             </ListItemIcon>
-            <ListItemText primary="Date Configuration" />
+            <ListItemText primary="Booking Date Management" />
           </ListItem>
           <Divider />
         </List>
-        <Box
-          sx={{ mt: "auto", mr: 2, display: "flex", justifyContent: "center" }}
-        >
+        <Box sx={{ mt: "auto", mr: 2, display: "flex", justifyContent: "center" }}>
           <img src={"./logo.png"} alt="Puzzle Panda" width={150} />
         </Box>
       </Drawer>

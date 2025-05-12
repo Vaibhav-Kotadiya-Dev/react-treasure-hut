@@ -1,13 +1,18 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import SuccessPage from "./pages/success";
-import Navbar from "./components/nav-bar";
-import Footer from "./components/footer";
 import BookingForm from "./pages/book-now";
 import Home from "./pages/home";
 import About from "./pages/about";
-import { ToastProvider } from "./components/toaster"; // adjust the path if needed
+import AdminUserTable from "./pages/admin-user-table";
+import AdminLogin from "./pages/admin-login";
+import PublicLayout from "./routes/public-layout";
+import PrivateLayout from "./routes/admin-layout/private-layout";
+import AuthLayout from "./routes/admin-layout/auth-layout";
+import { ToastProvider } from "./components/toaster";
 import "./style.css";
 import { useEffect } from "react";
+import AdminDateConfig from "./pages/date-configuration";
+
 const App = () => {
   const location = useLocation();
   useEffect(() => {
@@ -17,84 +22,37 @@ const App = () => {
       "/book-now": "Book now",
       "/success": "success",
     };
-
-    document.title = `Puzzle Panda  ${
+    document.title = `Puzzle Panda ${
       pageTitles[location.pathname] ? `| ${pageTitles[location.pathname]}` : ""
     }`;
   }, [location.pathname]);
+
   return (
     <ToastProvider>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-          width: "100%",
-        }}
-      >
-        <Navbar />
-        <div style={{ flexGrow: 1 }}>
-          <Routes>
-            <Route path="/success" element={<SuccessPage />} />
-            {/* <Route path="/register" element={<Users />} /> */}
-            {/* <Route path="/admin/users" element={<AdminUserTable />} />
-            <Route path="/admin/login" element={<AdminLogin />} /> */}
-            <Route path="/book-now" element={<BookingForm />} />
-            <Route path="/how-it-works" element={<About />} />
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-          </Routes>
-        </div>
-        <Footer />
-      </div>
+      <Routes>
+        <Route
+          path="/admin/login"
+          element={
+            <AuthLayout>
+              <AdminLogin />
+            </AuthLayout>
+          }
+        />
+        <Route path="/admin" element={<PrivateLayout />}>
+          <Route path="users" element={<AdminUserTable />} />
+          <Route path="date-config" element={<AdminDateConfig />} />
+        </Route>
+
+        <Route path="/" element={<PublicLayout />}>
+          <Route path="success" element={<SuccessPage />} />
+          <Route path="book-now" element={<BookingForm />} />
+          <Route path="how-it-works" element={<About />} />
+          <Route index element={<Home />} />
+          <Route path="home" element={<Home />} />
+        </Route>
+      </Routes>
     </ToastProvider>
   );
 };
 
 export default App;
-
-
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// // import Users from './pages/user';
-// import SuccessPage from "./pages/success";
-// import AdminUserTable from "./pages/admin-user-table";
-// import AdminLogin from "./pages/admin-login";
-// import Navbar from "./components/nav-bar";
-// import Footer from "./components/footer";
-// import BookingForm from "./pages/book-now";
-// import Home from "./pages/home";
-// import About from "./pages/about";
-// import { ToastProvider } from "./components/toaster"; // adjust the path if needed
-
-// const renderUserRoutes = () => {
-//   return (
-//     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh',width:"100%" }}>
-//         <Navbar />
-//         <div style={{ flexGrow: 1 }}>
-//           <Routes>
-//             <Route path="/success" element={<SuccessPage />} />
-//             <Route path="/book-now" element={<BookingForm />} />
-//             <Route path="/about" element={<About />} />
-//             <Route path="/" element={<Home />} />
-//             <Route path="/home" element={<Home />}/>
-//           </Routes>
-//         </div>
-//         <Footer />
-//       </div>
-//   );
-// };
-// const App = () => {
-//   return (
-//     <ToastProvider>
-//       <Router>
-//         <Routes>
-//           <Route path="/admin/users" element={<AdminUserTable />} />
-//           <Route path="/admin/login" element={<AdminLogin />} />
-//           <Route path="*" element={renderUserRoutes()} />
-//         </Routes>
-//       </Router>
-//     </ToastProvider>
-//   );
-// };
-
-// export default App;

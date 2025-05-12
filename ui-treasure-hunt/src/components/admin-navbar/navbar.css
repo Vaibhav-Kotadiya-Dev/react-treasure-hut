@@ -1,11 +1,6 @@
-.custom-navbar {
-    background: linear-gradient(
-      to right,
-      white 50%,
-      #DBBA2C 40.33% 50%
-    ) !important;
-  
+.custom-navbar-admin {
     height: 60px;
+    background: #fff !important;
   }
   
   .navbar-toolbar {

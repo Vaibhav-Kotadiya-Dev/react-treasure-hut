@@ -8,142 +8,65 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   Typography,
-  Menu,
-  MenuItem,
   useTheme,
   useMediaQuery,
+  Pagination,
+  Chip
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { listOfUser, updateUserRegistrationDate } from "../../api/user";
+import { listOfUser } from "../../api/user";
 import Loader from "../../components/loader";
-import UserActionsDialog from "../../components/dialog-box";
 
 const AdminUserTable = () => {
   const [users, setUsers] = useState([]);
   const [loader, setLoader] = useState(false);
-  const [updateLoading, setUpdateLoader] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [dialogFields, setDialogFields] = useState({});
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [menuUser, setMenuUser] = useState(null);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
+  const [openModal, setOpenModal] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   useEffect(() => {
-    if (!users.length) {
-      setLoader(true);
-      listOfUser()
-        .then((response) => {
-          const { data = [] } = response;
-          setUsers(data);
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-        .finally(() => {
-          setLoader(false);
-        });
-    }
-  }, []);
-
-  const formatDialogFields = () => {
-    return [
-      {
-        label: "Full Name",
-        name: "fullName",
-        value: dialogFields?.fullName,
-        editable: false,
-        isPrimary: true,
-      },
-      {
-        label: "Mobile Number",
-        name: "mobileNumber",
-        value: dialogFields?.mobileNumber,
-        editable: false,
-      },
-      {
-        label: "Number of Participants",
-        name: "teamMemberCount",
-        value: dialogFields?.teamMemberCount,
-        editable: false,
-      },
-      {
-        label: "Registration Date",
-        name: "registrationDate",
-        value: dialogFields?.registrationDate,
-        editable: true,
-        type: "date",
-      },
-    ];
-  };
-  const handleDialogFieldChange = (name, value) => {
-    setDialogFields((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const openUserDialog = (user) => {
-    setSelectedUser(user);
-    setDialogFields({
-      fullName: user.fullName || "",
-      mobileNumber: user.mobileNumber || "",
-      teamMemberCount: user.teamMemberCount || "",
-      registrationDate: user.registrationDate || "",
-    });
-    setDialogOpen(true);
-  };
-
-  const handleSaveClick = (userId) => {
-    if (dialogFields.registrationDate) {
-      setUpdateLoader(true);
-      updateUserRegistrationDate(userId, {
-        registrationDate: dialogFields.registrationDate,
+    setLoader(true);
+    listOfUser(page, rowsPerPage)
+      .then((response) => {
+        const { users = [], total = 0 } = response.data;
+        setUsers(users);
+        setTotalCount(total);
       })
-        .then((response) => {
-          // Add toast message
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-        .finally(() => {
-          setUpdateLoader(false);
-        });
-    }
-  };
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }, [page]);
+  
 
-  const handleMenuOpen = (event, user) => {
-    setAnchorEl(event.currentTarget);
-    setMenuUser(user);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setMenuUser(null);
-  };
-
-  const handleEdit = () => {
-    if (menuUser) openUserDialog(menuUser);
-    handleMenuClose();
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
   return loader ? (
-    <Loader />
+    <Loader variant="overlay" />
   ) : (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {updateLoading && <Loader variant="overlay" />}
       <Box
         sx={{
           padding: isMobile ? 1.5 : 6,
-          backgroundColor: "#f5f5f5",
+          // background:
+          //   "linear-gradient(to right, #DBBA2C 40.33% 50%, white 50%)",
           width: "auto",
+          minHeight: "calc(100vh - 100px)",
         }}
       >
         <Typography
           variant="h5"
-          sx={{ mb: 3, fontWeight: "bold", color: "#2b2c30" }}
+          sx={{ mb: 3, fontWeight: "bold", textTransform: "uppercase" }}
         >
           Admin User Management
         </Typography>
@@ -152,65 +75,107 @@ const AdminUserTable = () => {
           sx={{
             overflowX: "auto",
             width: "100%",
-            display: "block", // important!
+            display: "block",
+            boxShadow: "6px 6px 12px rgba(9, 9, 9, 0.1)!",
+            border: "1px solid #e0e0e0",
+            borderRadius: "7px",
           }}
         >
           <TableContainer
             component={Paper}
             elevation={3}
             sx={{
-              borderRadius: "10px",
+              // borderRadius: "7px",
               padding: 2,
-              minWidth: 700, // Add minimum width to prevent shrink
+              minWidth: 700,
             }}
           >
-            <Table sx={{ minWidth: 700 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>Full Name</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>
+            <Table sx={{ minWidth: 700, border: "1px solid #e0e0e0" }}>
+              <TableHead >
+                <TableRow sx={{ borderBottom: '1px solid #ccc'}}>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      borderRight: "1px solid #f0f0f0"
+                    }}
+                  >
+                    Full Name
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      borderRight: "1px solid #f0f0f0"
+                    }}
+                  >
                     Mobile Number
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      borderRight: "1px solid #f0f0f0"
+                    }}
+                  >
                     Payment Status
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Quiz Status</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      borderRight: "1px solid #f0f0f0"
+                    }}
+                  >
+                    Quiz Status
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      borderRight: "1px solid #f0f0f0"
+                    }}
+                  >
                     Registration Date
                   </TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user._id} hover>
-                    <TableCell>{user.fullName || "N/A"}</TableCell>
-                    <TableCell>{user.mobileNumber}</TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: user.isPaymentSuccessful ? "green" : "red",
-                        }}
-                      >
-                        {user.isPaymentSuccessful ? "Paid" : "Unpaid"}
-                      </Typography>
+                {users?.map((user) => (
+                  <TableRow key={user._id} hover sx={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
+                      {user.fullName || "N/A"}
                     </TableCell>
-                    <TableCell>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: user.hasVoucher ? "green" : "orange" }}
-                      >
-                        {user.hasVoucher ? "Completed" : "Pending"}
-                      </Typography>
+                    <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0"}}>
+                      {user.mobileNumber}
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
+                      <Chip
+                        label={user.isPaymentSuccessful ? "Paid" : "Unpaid"}
+                        color={user.isPaymentSuccessful ? "success" : "default"}
+                        size="small"
+                        variant={
+                          user.isPaymentSuccessful ? "filled" : "outlined"
+                        }
+                      />
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
+                      <Chip
+                        label={user.hasVoucher ? "Completed" : "Pending"}
+                        color={user.hasVoucher? "success" : "warning"}
+                        size="small"
+                        variant={
+                          user.hasVoucher? "filled" : "outlined"
+                        }
+                      />
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
                       {dayjs(user.registrationDate).format("DD/MM/YYYY")}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={(e) => handleMenuOpen(e, user)}>
-                        <MoreVertIcon />
-                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -218,42 +183,24 @@ const AdminUserTable = () => {
             </Table>
           </TableContainer>
         </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 3,
+          }}
+        >
+          <Pagination
+            count={Math.ceil(totalCount / rowsPerPage)}
+            page={page}
+            onChange={handleChangePage}
+            color="primary"
+          />
+        </Box>
       </Box>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleEdit} disabled={menuUser?.hasVoucher}>
-          Edit
-        </MenuItem>
-        <MenuItem disabled>Delete</MenuItem>
-      </Menu>
-      <UserActionsDialog
-        open={dialogOpen}
-        label={"Update Details"}
-        handleClose={() => setDialogOpen(false)}
-        fields={formatDialogFields()}
-        onFieldChange={handleDialogFieldChange}
-        actions={[
-          {
-            label: "Cancel",
-            onClick: () => setDialogOpen(false),
-            variant: "outlined",
-          },
-          {
-            label: "Update Role",
-            onClick: () => {
-              handleSaveClick(selectedUser._id);
-              setDialogOpen(false);
-            },
-            color: "primary",
-          },
-        ]}
-      />
     </LocalizationProvider>
   );
 };
 
 export default AdminUserTable;
+

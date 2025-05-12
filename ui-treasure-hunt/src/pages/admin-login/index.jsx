@@ -80,13 +80,24 @@ const AdminLogin = () => {
   return (
     <Box className="admin-login-layout">
       <Box className="admin-login-wrapper-bg">
-        <Paper className="admin-login-paper">
+        <Paper
+          className="admin-login-paper"
+          sx={{
+            "border-radius": "10px",
+            padding: "40px 15px",
+            "box-shadow": "6px 6px 12px rgba(9, 9, 9, 0.1)",
+            "borderBlockColor": "Highlight"
+          }}
+        >
           <Box className="admin-login-header">
-            <Avatar className="admin-login-avatar" sx={{ bgcolor: 'primary.main' }}>
-              <LockOutlinedIcon style={{ color: '#fff' }} />
+            <Avatar
+              className="admin-login-avatar"
+              sx={{ bgcolor: "primary.main" }}
+            >
+              <LockOutlinedIcon style={{ color: "#fff" }} />
             </Avatar>
             <Typography variant="h5" className="admin-login-title">
-              Admin Login
+              ADMIN PORTAL
             </Typography>
           </Box>
           <form onSubmit={handleSubmit}>
@@ -100,8 +111,20 @@ const AdminLogin = () => {
               error={mobileError}
               onChange={handleMobileChange}
               onBlur={validateMobile}
-              helperText={mobileError ? 'Enter a valid mobile number' : ''}
+              helperText={mobileError ? "Enter a valid mobile number" : ""}
               disabled={loading}
+              sx={
+                {
+                  "& .MuiFormHelperText-root": {
+                    color: "error.main",
+                    marginLeft: 0.5,
+                    fontSize: "0.75rem",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                      "borderRadius": "10px" 
+                  }
+                }
+              }
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -112,7 +135,7 @@ const AdminLogin = () => {
             />
             <TextField
               label="Password"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               variant="outlined"
               fullWidth
               required={true}
@@ -120,6 +143,18 @@ const AdminLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
+              sx={
+                {
+                  "& .MuiFormHelperText-root": {
+                    color: "error.main",
+                    marginLeft: 0.5,
+                    fontSize: "0.75rem",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                      "borderRadius": "10px" 
+                  }
+                }
+              }
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -137,7 +172,7 @@ const AdminLogin = () => {
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
-                )
+                ),
               }}
             />
             <Button
@@ -145,11 +180,20 @@ const AdminLogin = () => {
               variant="contained"
               color="primary"
               fullWidth
-              className="admin-login-button"
               disabled={loading || !isFormValid}
-              startIcon={loading && <CircularProgress size={20} color="inherit" />}
+              startIcon={
+                loading && <CircularProgress size={20} color="inherit" />
+              }
+              sx={{
+                "margin-top": "24px",
+                "height": "44px",
+                "font-weight": "bold",
+                "border-radius": "10px",
+                "font-size": "15px",
+                "text-transform": "none",
+              }}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {"LOGIN"}
             </Button>
           </form>
         </Paper>

@@ -1,5 +1,6 @@
 import Navbar from '../components/nav-bar';
 import Footer from '../components/footer';
+import { Outlet } from 'react-router-dom';
 
 const PublicLayout = ({ children }) => (
   <div
@@ -11,7 +12,9 @@ const PublicLayout = ({ children }) => (
     }}
   >
     <Navbar />
-    <div style={{ flexGrow: 1 }}>{children}</div>
+    <div style={{ flexGrow: 1 }}>
+      <Outlet />
+    </div>
     <Footer />
   </div>
 );

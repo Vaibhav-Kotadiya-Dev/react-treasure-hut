@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import PhoneInput from "react-phone-number-input";
@@ -12,6 +12,7 @@ import { createStripeCheckoutSession } from "../../api/payment";
 import { useToast } from "../../components/toaster";
 import "react-phone-number-input/style.css";
 import Loader from "../../components/loader";
+import { publicListOfLockedDates } from "../../api/dates-api";
 
 const BookingForm = () => {
   const [participants, setParticipants] = useState(2);
@@ -20,7 +21,28 @@ const BookingForm = () => {
   const [whatsapp, setWhatsapp] = useState("");
   const [errors, setErrors] = useState({});
   const [loader, setLoader] = useState(false);
+  const [disableDates, setDisableDates] = useState([]);
   const { showToast } = useToast();
+  const [globalLoader, setGlobalLoader] = useState(false);
+  useEffect(() => {
+    setGlobalLoader(true);
+    publicListOfLockedDates()
+      .then((response) => {
+        const { data = {} } = response;
+        const { lockedDates = [] } = data;
+        setDisableDates(lockedDates);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setGlobalLoader(false);
+      });
+  }, []);
+
+  const isDisabled = (date) => {
+    return disableDates.includes(date.format("YYYY-MM-DD"));
+  };
 
   const pricePerPerson = 10;
   const total =
@@ -89,6 +111,7 @@ const BookingForm = () => {
     }
   };
   return (
+    globalLoader ? <Loader variant={'overlay'} /> :
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box className="booking-main">
         <Box className="card-main">
@@ -140,6 +163,7 @@ const BookingForm = () => {
                   value={registrationDate}
                   minDate={dayjs()}
                   format="DD/MM/YYYY"
+                  shouldDisableDate={isDisabled}
                   onChange={(newValue) => setRegistrationDate(newValue)}
                   className="form-input"
                 />
@@ -244,7 +268,7 @@ const BookingForm = () => {
                 disabled={!isFormValid()}
                 onClick={handleOnClick}
               >
-                {loader ? <Loader color={'white'} size={30} /> : 'PAY NOW'}
+                {loader ? <Loader color={'success'} /> : 'PAY NOW'}
               </Button>
             </Box>
           </Box>

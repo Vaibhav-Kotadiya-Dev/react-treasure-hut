@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,7 +31,7 @@ axiosInstance.interceptors.response.use(
           originalRequest._retry = true;
           try {
             const res = await axios.post(
-              'http://localhost:5000/api/user/refresh-token',
+              'http://localhost:8080/api/user/refresh-token',
               {},
               { withCredentials: true }
             );
