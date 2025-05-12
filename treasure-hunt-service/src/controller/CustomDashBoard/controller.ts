@@ -14,7 +14,6 @@ import {
   QUIZ_COMPLETED,
   QUIZ_START_KEYWORD,
   TOTAL_SEQUENCE,
-  WELCOME_MESSAGE,
 } from "../../utils/constant";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 
@@ -90,9 +89,9 @@ class MessengerController {
           mobileNumber: phone,
           isPaymentSuccessful: { $eq: true },
           userType: { $eq: "user" },
+          hasVoucher: { $eq: false },
           registrationDate: { $eq: todayDateIsoString },
         });
-        console.log(userData, todayDateIsoString)
         if (!userData) {
           return await sendWhatsAppMessage(phone, NO_BOOKING_TODAY);
         } else {
@@ -147,12 +146,14 @@ class MessengerController {
                     phone,
                     `✅ Great job — that's the correct answer! 🎯🎉`
                   );
+                  await new Promise(resolve => setTimeout(resolve, 500));
                 }
                 if (currentSequence === 3 || currentSequence === 6) {
                   await sendWhatsAppMessage(
                     phone,
                     `🎁 You've unlocked a voucher! 🪙 Voucher: ${question?.voucher?.voucherText}`
                   );
+                  await new Promise(resolve => setTimeout(resolve, 500));
                 }
                 const nextSequence = currentSequence + 1;
                 if (nextSequence < TOTAL_SEQUENCE) {
@@ -171,6 +172,7 @@ class MessengerController {
                     phone,
                     `${prefixText}: ${nextQuestion?.clue}`
                   );
+                  await new Promise(resolve => setTimeout(resolve, 500));
                 } else {
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
@@ -189,6 +191,7 @@ class MessengerController {
                 });
                 const hint = `❌ That's not the correct answer.💡 Here's a hint: ${question.hint}`;
                 await sendWhatsAppMessage(phone, hint);
+                await new Promise(resolve => setTimeout(resolve, 500));
               } else {
                 const nextSequence = currentSequence + 1;
 
@@ -206,19 +209,37 @@ class MessengerController {
                       : question?.answer.join(",");
                   await sendWhatsAppMessage(
                     phone,
-                    `✅ Great job — that's the correct answer! 🎯🎉 : ${correctAnswers}`
+                    `❌ Oops! That’s not correct. The right answer was: ${correctAnswers}.`
                   );
+                  await new Promise(resolve => setTimeout(resolve, 500));
                   if (currentSequence === 3 || currentSequence === 6) {
                     await sendWhatsAppMessage(
                       phone,
                       `🎁 You've unlocked a voucher! 🪙 Voucher: ${question?.voucher?.voucherText}`
                     );
                   }
+                  await new Promise(resolve => setTimeout(resolve, 500));
                   await sendWhatsAppMessage(
                     phone,
                     `👉 Next question: ${nextQuestion?.clue}`
                   );
                 } else {
+                  const correctAnswers =
+                    question?.answer?.length === 1
+                      ? question?.answer[0]
+                      : question?.answer.join(",");
+                  await sendWhatsAppMessage(
+                    phone,
+                    `❌ Oops! That’s not correct. The right answer was: ${correctAnswers}.`
+                  );
+                  await new Promise(resolve => setTimeout(resolve, 500));
+                  if (currentSequence === 3 || currentSequence === 6) {
+                    await sendWhatsAppMessage(
+                      phone,
+                      `🎁 You've unlocked a voucher! 🪙 Voucher: ${question?.voucher?.voucherText}`
+                    );
+                  }
+                  await new Promise(resolve => setTimeout(resolve, 500));
                   await this.userRepository.updateById(userData._id, {
                     hasVoucher: true,
                     voucherUnlockedAt: new Date(),
