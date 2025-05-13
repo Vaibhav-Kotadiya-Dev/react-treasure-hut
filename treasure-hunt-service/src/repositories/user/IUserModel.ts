@@ -20,4 +20,5 @@ export default interface IUserModel extends IVersionSchema {
   hashedPassword: string;
   fullName: string;
   refreshToken: string;
+  phoneCountryCode: string;
 };

@@ -10,6 +10,7 @@ interface IConfig {
     JWT_EXPIRE: string;
     SALT_ROUND: string;
     FE_URL: string;
+    CONCURRENCY_LIMIT: number;
 }
 
 export default IConfig;

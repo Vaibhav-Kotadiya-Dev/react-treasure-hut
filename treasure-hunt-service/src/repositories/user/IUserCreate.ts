@@ -20,4 +20,5 @@ export default interface IUserCreate {
     hashedPassword: string;
     fullName: string;
     refreshToken: string;
+    phoneCountryCode: string;
 };

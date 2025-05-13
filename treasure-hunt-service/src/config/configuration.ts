@@ -14,7 +14,8 @@ const configuration : IConfig = {
     JWT_SECRET: process.env.JWT_SECRET || '',
     JWT_EXPIRE: process.env.JWT_EXPIRE || '',
     SALT_ROUND: process.env.SALT_ROUND || '',
-    FE_URL: process.env.FE_URL || ''
+    FE_URL: process.env.FE_URL || '',
+    CONCURRENCY_LIMIT: Number(process.env.CONCURRENCY_LIMIT) || 5
 };
 
 export default Object.freeze(configuration);

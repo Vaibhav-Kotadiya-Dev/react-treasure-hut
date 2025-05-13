@@ -59,7 +59,7 @@ export default class Server {
         app.listen(port, () => {
           console.log(`:::App is running successfully at port number: ${port}:::::::`);
           seedQuestionsIfEmpty();
-          // startBroadcastJob();
+          startBroadcastJob();
         });
       })
       .catch((err) => {

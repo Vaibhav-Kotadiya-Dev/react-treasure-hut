@@ -37,6 +37,10 @@ export default class UserSchema extends VersionSchema {
       refreshToken: {
         type: String,
         default: null
+      },
+      phoneCountryCode: {
+        type: String,
+        required: true
       }
     };
     super(userSchema, options);

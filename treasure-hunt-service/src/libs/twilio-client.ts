@@ -5,10 +5,10 @@ const client = new Twilio(
     process.env.TWILIO_AUTH_TOKEN!
 );
 
-const sendWhatsAppMessage = (phone: string = '', messageBody: string = ''): Promise<any> => {
+const sendWhatsAppMessage = (phoneCode: string = '', phone: string = '', messageBody: string = ''): Promise<any> => {
   return client.messages.create({
     from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER!}`,
-    to: `whatsapp:+91${phone!}`,
+    to: `whatsapp:+${phoneCode!}${phone!}`,
     body: `${messageBody}`,
   });
 };

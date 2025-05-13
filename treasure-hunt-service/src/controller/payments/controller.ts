@@ -141,6 +141,9 @@ class PaymentController {
         const mobileNumber = parsePhoneNumberWithError(
           metadata?.mobileNumber || ""
         )?.nationalNumber;
+        const phoneCode = parsePhoneNumberWithError(
+          metadata?.mobileNumber || ""
+        )?.countryCallingCode;
         const registrationDate = metadata?.registrationDate
           ? metadata.registrationDate
           : new Date();
@@ -173,6 +176,7 @@ class PaymentController {
             registrationDate: regDateOnly?.toISOString(),
             teamMemberCount,
             fullName,
+            phoneCountryCode: phoneCode,
             userType: UserType.USER,
             permissions: [Permission.CREATE, Permission.READ],
           });
@@ -199,18 +203,23 @@ class PaymentController {
               throw error;
             }
             await sendWhatsAppMessage(
+              phoneCode,
               userResponse?.mobileNumber,
               WELCOME_MESSAGE
             );
+            await new Promise(resolve => setTimeout(resolve, 500));
             await sendWhatsAppMessage(
+              phoneCode,
               userResponse?.mobileNumber,
               `${question?.clue}`
             );
             await this.userRepository.updateById(userResponse._id, {
               currentSequence: question.sequence,
+              isBroadcasted: true,
             });
           } else {
             await sendWhatsAppMessage(
+              phoneCode,
               userResponse?.mobileNumber,
               FUTURE_ONBOARD_WELCOME_MESSAGE(dayjs(userResponse?.registrationDate).format("dddd, MMMM D, YYYY"))
             );
