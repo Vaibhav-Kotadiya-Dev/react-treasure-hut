@@ -71,7 +71,7 @@ const PaymentSuccess = () => {
           Payment confirmed!
         </Typography>
         <Typography variant="body1" className="adventure-text">
-          Get ready to begin your adventure!
+         {`Thanks for registering! Please check your WhatsApp — we’ve sent you a confirmation message.`}
         </Typography>
         <Button
           color="black"

@@ -268,7 +268,7 @@ const BookingForm = () => {
                 disabled={!isFormValid()}
                 onClick={handleOnClick}
               >
-                {loader ? <Loader color={'success'} /> : 'PAY NOW'}
+                {!loader ? <Loader color={'#FFFFFF'} /> : 'PAY NOW'}
               </Button>
             </Box>
           </Box>

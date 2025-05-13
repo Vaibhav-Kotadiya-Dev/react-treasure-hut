@@ -1,6 +1,7 @@
 import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TextField, Button, Box } from "@mui/material";
+import dayjs from "dayjs";
 
 const DisabledDatePicker = ({ value, onChange, onAdd }) => {
   return (
@@ -20,6 +21,7 @@ const DisabledDatePicker = ({ value, onChange, onAdd }) => {
         value={value}
         onChange={onChange}
         format="DD/MM/YYYY"
+        minDate={dayjs()}
         slotProps={{
           textField: {
             label: "Select Date",

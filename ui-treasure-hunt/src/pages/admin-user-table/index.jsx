@@ -143,24 +143,34 @@ const AdminUserTable = () => {
                   >
                     Registration Date
                   </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      borderRight: "1px solid #f0f0f0"
+                    }}
+                  >
+                    Participants
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users?.map((user) => (
                   <TableRow key={user._id} hover sx={{ borderBottom: '1px solid #f0f0f0' }}>
                     <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
-                      {user.fullName || "N/A"}
+                      {user?.fullName || "N/A"}
                     </TableCell>
                     <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0"}}>
-                      {user.mobileNumber}
+                      {user?.mobileNumber}
                     </TableCell>
                     <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
                       <Chip
-                        label={user.isPaymentSuccessful ? "Paid" : "Unpaid"}
-                        color={user.isPaymentSuccessful ? "success" : "default"}
+                        label={user?.isPaymentSuccessful ? "Paid" : "Unpaid"}
+                        color={user?.isPaymentSuccessful ? "success" : "default"}
                         size="small"
                         variant={
-                          user.isPaymentSuccessful ? "filled" : "outlined"
+                          user?.isPaymentSuccessful ? "filled" : "outlined"
                         }
                       />
                     </TableCell>
@@ -170,12 +180,15 @@ const AdminUserTable = () => {
                         color={user.hasVoucher? "success" : "warning"}
                         size="small"
                         variant={
-                          user.hasVoucher? "filled" : "outlined"
+                          user?.hasVoucher? "filled" : "outlined"
                         }
                       />
                     </TableCell>
                     <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
                       {dayjs(user.registrationDate).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center", borderRight: "1px solid #f0f0f0" }}>
+                      {user?.teamMemberCount}
                     </TableCell>
                   </TableRow>
                 ))}
