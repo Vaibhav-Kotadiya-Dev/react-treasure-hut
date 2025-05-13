@@ -10,7 +10,7 @@ dotenv.config();
 
 export const startBroadcastJob = (): void => {
   cron.schedule(
-    "*/1 * * * *",
+    "*/5 10-11 * * *",
     async (): Promise<void> => {
       try {
         const todaysDate = new Date();
