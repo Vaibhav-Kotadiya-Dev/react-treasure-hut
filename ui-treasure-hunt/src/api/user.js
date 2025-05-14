@@ -12,10 +12,11 @@ const registorUser = (dataToPost) => {
     );
 };
 
-const listOfUser = (page = 0, limit = 5) => {
+const listOfUser = (page = 0, limit = 5, filter) => {
   return AxiosInterceptor.get("/api/user/list",{ params: {
     page,
-    limit
+    limit,
+    ...filter
   }},{ withCredentials: true });
 };
 

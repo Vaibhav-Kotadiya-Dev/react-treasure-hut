@@ -96,7 +96,7 @@ const AdminNavbar = () => {
           <Divider />
         </List>
         <Box sx={{ mt: "auto", mr: 2, display: "flex", justifyContent: "center" }}>
-          <img src={"./logo.png"} alt="Puzzle Panda" width={150} />
+          <img src={"/logo.png"} alt="Puzzle Panda" width={150} />
         </Box>
       </Drawer>
     </>
