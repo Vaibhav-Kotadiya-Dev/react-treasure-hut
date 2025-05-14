@@ -70,6 +70,7 @@ const createMultipleAdmins = async () => {
         permissions: [Permission.CREATE, Permission.READ, Permission.UPDATE, Permission.DELETE],
         isActive: true,
         forcePasswordReset: true,
+        phoneCountryCode: 'N/A'
       });
       console.log(`Admin with mobile number ${mobileNumber} created.`);
     }

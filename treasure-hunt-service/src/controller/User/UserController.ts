@@ -60,7 +60,7 @@ class UserController {
         const error = new Error('No Question found') as any;
         error.statusCode = 404;
         throw error;
-      };
+      }
       await sendWhatsAppMessage(response?.mobileNumber, question?.clue);
       await this.userRepository.update({ mobileNumber }, { currentSequence: question.sequence });
       return res.status(200).json(response);
@@ -146,8 +146,21 @@ class UserController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+      const registrationDate = req.query.registrationDate as string || "";
       const skip = (page - 1) * limit;
-      const filter = { isPaymentSuccessful: { $eq: true } };
+      const filter: any = { isPaymentSuccessful: { $eq: true } };
+      if(registrationDate) { 
+        const requestedDate = new Date(registrationDate);
+        const requestedDateUTC = new Date(
+          Date.UTC(
+            requestedDate.getUTCFullYear(),
+            requestedDate.getUTCMonth(),
+            requestedDate.getUTCDate()
+          )
+        ).toISOString();
+        filter.registrationDate = { $eq: requestedDateUTC }; 
+      }
+      console.log(filter)
       const [users, totalCount] = await Promise.all([
         this.userRepository.list(filter, {}, { skip, limit }),
         this.userRepository.countDocuments(filter)
@@ -220,8 +233,7 @@ class UserController {
       }
       return res.status(200).json({ message: "User updated successfully", data: response });
     } catch (error) {
-      console.error(error);
-      return res.sendStatus(500);
+      next(error);
     }
   };
   
