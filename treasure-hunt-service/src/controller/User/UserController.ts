@@ -9,6 +9,7 @@ import { Permission, UserType } from "../../utils/constant";
 import { generateAccessToken, generateRefreshToken } from "../../utils/AuthService";
 import sendWhatsAppMessage from "../../libs/twilio-client";
 import QuestionRepository from "../../repositories/questions/QuestionRepositories";
+import dayjs from "dayjs";
 
 class UserController {
   private userRepository: UserRepository = new UserRepository();
@@ -160,7 +161,6 @@ class UserController {
         ).toISOString();
         filter.registrationDate = { $eq: requestedDateUTC }; 
       }
-      console.log(filter)
       const [users, totalCount] = await Promise.all([
         this.userRepository.list(filter, {}, { skip, limit }),
         this.userRepository.countDocuments(filter)
@@ -218,19 +218,30 @@ class UserController {
   ): Promise<any> => {
     try {
       const { id } = req.params;
-      const { registrationDate, teamMemberCount } = req.body;
+      const { registrationDate } = req.body;
       if (!id) {
         return res.status(400).json({ message: "User ID is required" });
       }
       const updateData: Partial<IUserModel> = {};
-      const updatedRegistrationDate: Date = new Date(registrationDate);
-      updatedRegistrationDate.setUTCHours(0, 0, 0, 0);
-      if (registrationDate) updateData.registrationDate = updatedRegistrationDate.toISOString();
-      if (teamMemberCount) updateData.teamMemberCount = teamMemberCount;
+      const regDate = new Date(registrationDate);
+      const updatedRegistrationDate = new Date(
+        Date.UTC(
+          regDate.getUTCFullYear(),
+          regDate.getUTCMonth(),
+          regDate.getUTCDate()
+        )
+      );
+      if (registrationDate)
+        updateData.registrationDate = updatedRegistrationDate.toISOString();
       const response = await this.userRepository.updateById(id, updateData);
       if (!response) {
-        return res.status(404).json({ message: "User not found or not updated" });
+        return res
+          .status(404)
+          .json({ message: "User not found or not updated" });
       }
+      const updatedDate = dayjs(registrationDate).format('DD MMM YYYY');
+      const message = `🛠️ Update Notice: Your registration date has been updated by the admin to ${updatedDate}.`;
+      if(registrationDate) sendWhatsAppMessage(response.phoneCountryCode, response.mobileNumber, message);
       return res.status(200).json({ message: "User updated successfully", data: response });
     } catch (error) {
       next(error);
