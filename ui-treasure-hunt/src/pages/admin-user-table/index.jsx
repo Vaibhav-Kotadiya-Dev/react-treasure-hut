@@ -13,12 +13,20 @@ import {
   useMediaQuery,
   Pagination,
   Chip,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  Dialog,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { listOfUser } from "../../api/user";
+import { listOfUser, updateUserRegistrationDate } from "../../api/user";
 import Loader from "../../components/loader";
+import { useToast } from "../../components/toaster";
+import { publicListOfLockedDates } from "../../api/dates-api";
 
 const AdminUserTable = () => {
   const [users, setUsers] = useState([]);
@@ -29,8 +37,12 @@ const AdminUserTable = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedDate, setSelectedDate] = useState(null);
-  console.log(selectedDate?.format("YYYY-MM-DD"), "selectedDate");
-
+  const [userDates, setUserDates] = useState({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [tempDate, setTempDate] = useState({});
+  const [userId, setUserId] = useState(null);
+  const [disableDates, setDisableDates] = useState([]);
+  const { showToast } = useToast();
   useEffect(() => {
     setLoader(true);
     listOfUser(page, rowsPerPage)
@@ -46,6 +58,22 @@ const AdminUserTable = () => {
         setLoader(false);
       });
   }, [page]);
+
+  useEffect(() => {
+      setLoader(true);
+      publicListOfLockedDates()
+        .then((response) => {
+          const { data = {} } = response;
+          const { lockedDates = [] } = data;
+          setDisableDates(lockedDates);
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          setLoader(false);
+        });
+    }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -81,6 +109,40 @@ const AdminUserTable = () => {
   //     setLoader(false);
   //   });
   // }
+  const handleUserDateValues = (newDate, previousRegistrationDate, userId) => {
+    const formattedNewDate = dayjs(newDate).format("YYYY-MM-DD");
+    const oldDate = dayjs(previousRegistrationDate).format("YYYY-MM-DD");
+    if (formattedNewDate === oldDate) return;
+    setTempDate(formattedNewDate);
+    setUserId(userId);
+    setIsDialogOpen(true);
+  };
+  const handleCancelChange = () => {
+    setTempDate(null);
+    setUserId(null);
+    setIsDialogOpen(false);
+  };
+  const handleConfirmChange = () => {
+    setUserDates({ ...userDates, [userId]: tempDate });
+    setLoader(true);
+    updateUserRegistrationDate(userId, {
+      registrationDate: tempDate
+    }).then((response) => {
+      setTempDate(null);
+      setUserId(null);
+      const { data = {}} = response;
+      showToast(data?.message, 'success');
+    }).catch(()=>{
+      showToast('Some thing went wrong', 'error');
+    }).finally(() => {
+      setIsDialogOpen(false);
+      setLoader(false);
+    });
+  };
+
+  const isDisabled = (date) => {
+    return disableDates.includes(date.format("YYYY-MM-DD"));
+  };
 
   return loader ? (
     <Loader variant="overlay" />
@@ -204,7 +266,7 @@ const AdminUserTable = () => {
                       borderRight: "1px solid #f0f0f0",
                     }}
                   >
-                    Registration Date
+                    Treasure Hunt Date
                   </TableCell>
                   <TableCell
                     sx={{
@@ -279,7 +341,30 @@ const AdminUserTable = () => {
                           borderRight: "1px solid #f0f0f0",
                         }}
                       >
-                        {dayjs(user.registrationDate).format("DD/MM/YYYY")}
+                        <DatePicker
+                          value={
+                            userDates[user?._id]
+                              ? dayjs(userDates[user?._id])
+                              : dayjs(user?.registrationDate)
+                          }
+                          onChange={(newDate) =>
+                            handleUserDateValues(
+                              newDate,
+                              user?.registrationDate,
+                              user?._id
+                            )
+                          }
+                          format="DD/MM/YYYY"
+                          minDate={dayjs()}
+                          shouldDisableDate={isDisabled}
+                          slotProps={{
+                            textField: {
+                              label: "Select Date",
+                              size: "small",
+                            },
+                            borderColor: "#f0f0f0",
+                          }}
+                        />
                       </TableCell>
                       <TableCell
                         sx={{
@@ -294,11 +379,7 @@ const AdminUserTable = () => {
                 </TableBody>
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    align="center"
-                    sx={{ py: 4 }}
-                  >
+                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                     <Typography
                       variant="h5"
                       sx={{
@@ -331,6 +412,40 @@ const AdminUserTable = () => {
               color="primary"
             />
           )}
+        </Box>
+        <Box>
+          <Dialog
+            open={isDialogOpen}
+            onClose={handleCancelChange}
+            aria-labelledby="confirm-dialog-title"
+            aria-describedby="confirm-dialog-description"
+          >
+            <DialogTitle id="confirm-dialog-title">
+              Confirm Date Change
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="confirm-dialog-description">
+                Are you sure you want to change the date to{" "}
+                <strong>{dayjs(tempDate).format("DD MMM YYYY")}</strong>?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={handleCancelChange}
+                color="error"
+                variant="outlined"
+              >
+                No
+              </Button>
+              <Button
+                onClick={handleConfirmChange}
+                variant="contained"
+                autoFocus
+              >
+                Yes, Change
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Box>
     </LocalizationProvider>
